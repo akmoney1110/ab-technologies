@@ -31,43 +31,55 @@ import {
 
 export default function ABTechnologyServices() {
     const sectionRef = useRef(null);
-    const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
     const [activeStep, setActiveStep] = useState(0);
     const [visibleItems, setVisibleItems] = useState(new Set());
 
-    // Mouse tracking for ambient glow
+    // Auto-cycle deployment steps only when motion is allowed.
     useEffect(() => {
-        const handleMove = (e) => {
-            if (!sectionRef.current) return;
-            const rect = sectionRef.current.getBoundingClientRect();
-            setMousePos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
-        };
-        const el = sectionRef.current;
-        el?.addEventListener("mousemove", handleMove);
-        return () => el?.removeEventListener("mousemove", handleMove);
-    }, []);
+        const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (reduceMotion) return undefined;
 
-    // Auto-cycle deployment steps
-    useEffect(() => {
         const interval = setInterval(() => {
-            setActiveStep((prev) => (prev + 1) % 6);
-        }, 2200);
+            if (!document.hidden) {
+                setActiveStep((prev) => (prev + 1) % 6);
+            }
+        }, 3200);
+
         return () => clearInterval(interval);
     }, []);
 
-    // Intersection observer for reveal animations
+    // Reveal each card once, scoped to this section only.
     useEffect(() => {
+        const root = sectionRef.current;
+        if (!root) return undefined;
+
+        const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        const items = root.querySelectorAll("[data-id]");
+
+        if (reduceMotion || !("IntersectionObserver" in window)) {
+            setVisibleItems(new Set(Array.from(items, (el) => el.dataset.id)));
+            return undefined;
+        }
+
         const observer = new IntersectionObserver(
             (entries) => {
                 entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        setVisibleItems((prev) => new Set(prev).add(entry.target.dataset.id));
-                    }
+                    if (!entry.isIntersecting) return;
+
+                    const id = entry.target.dataset.id;
+                    setVisibleItems((prev) => {
+                        if (prev.has(id)) return prev;
+                        const next = new Set(prev);
+                        next.add(id);
+                        return next;
+                    });
+                    observer.unobserve(entry.target);
                 });
             },
-            { threshold: 0.1 }
+            { threshold: 0.08, rootMargin: "120px 0px" }
         );
-        document.querySelectorAll("[data-id]").forEach((el) => observer.observe(el));
+
+        items.forEach((el) => observer.observe(el));
         return () => observer.disconnect();
     }, []);
 
@@ -173,7 +185,9 @@ export default function ABTechnologyServices() {
             id="technology-services"
             className="
                 relative isolate overflow-hidden
-                py-24 lg:py-32
+                py-20 sm:py-24 lg:py-32
+                [content-visibility:auto]
+                [contain-intrinsic-size:1px_4200px]
                 bg-gradient-to-b from-slate-50 via-white to-slate-50
                 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950
                 text-slate-950 dark:text-white
@@ -182,19 +196,13 @@ export default function ABTechnologyServices() {
         >
             {/* ============ BACKGROUND ATMOSPHERE ============ */}
             <div className="pointer-events-none absolute inset-0 overflow-hidden">
-                {/* Mouse-following glow */}
-                <div
-                    className="absolute h-[700px] w-[700px] rounded-full bg-blue-500/10 blur-[140px] transition-all duration-700 ease-out"
-                    style={{
-                        left: `${mousePos.x - 350}px`,
-                        top: `${mousePos.y - 350}px`,
-                    }}
-                />
+                {/* Lightweight ambient glow: desktop only, no mouse-driven React updates */}
+                <div className="absolute hidden lg:block left-1/2 top-20 h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-blue-500/[0.07] blur-[100px]" />
 
                 {/* Static glows */}
-                <div className="absolute -top-48 -right-40 h-[600px] w-[600px] rounded-full bg-blue-500/10 blur-[120px] animate-pulse" />
-                <div className="absolute -bottom-56 -left-48 h-[650px] w-[650px] rounded-full bg-purple-500/10 blur-[120px] animate-pulse" />
-                <div className="absolute left-1/2 top-1/3 h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-cyan-400/8 blur-[130px]" />
+                <div className="absolute hidden md:block -top-48 -right-40 h-[520px] w-[520px] rounded-full bg-blue-500/[0.08] blur-[100px] lg:animate-pulse motion-reduce:animate-none" />
+                <div className="absolute hidden lg:block -bottom-56 -left-48 h-[560px] w-[560px] rounded-full bg-purple-500/[0.08] blur-[100px] lg:animate-pulse motion-reduce:animate-none" />
+                <div className="absolute hidden lg:block left-1/2 top-1/3 h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-cyan-400/[0.06] blur-[100px]" />
 
                 {/* Dot grid */}
                 <div
@@ -216,8 +224,8 @@ export default function ABTechnologyServices() {
 
                 {/* ============ SECTION INTRO ============ */}
                 <div className="mx-auto max-w-3xl text-center">
-                    <div className="inline-flex items-center gap-2 rounded-full border border-blue-500/20 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-cyan-500/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-blue-600 backdrop-blur-sm dark:border-blue-400/20 dark:text-blue-400">
-                        <Sparkles className="h-4 w-4 animate-pulse" />
+                    <div className="inline-flex items-center gap-2 rounded-full border border-blue-500/20 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-cyan-500/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-blue-600 lg:backdrop-blur-sm dark:border-blue-400/20 dark:text-blue-400">
+                        <Sparkles className="h-4 w-4 md:animate-pulse motion-reduce:animate-none" />
                         Technology Services
                         <span className="flex h-1.5 w-1.5 rounded-full bg-blue-500" />
                     </div>
@@ -263,9 +271,10 @@ export default function ABTechnologyServices() {
                         className="
                             group relative overflow-hidden rounded-[2.5rem]
                             border border-slate-200/80 dark:border-white/10
-                            bg-white/80 dark:bg-slate-900/70
-                            backdrop-blur-xl
-                            shadow-[0_25px_80px_-20px_rgba(15,23,42,0.15)]
+                            bg-white dark:bg-slate-900
+                            md:bg-white/90 md:dark:bg-slate-900/85
+                            lg:backdrop-blur-md
+                            shadow-sm lg:shadow-[0_25px_80px_-20px_rgba(15,23,42,0.15)]
                             dark:shadow-[0_25px_80px_-20px_rgba(0,0,0,0.5)]
                             lg:col-span-3 lg:p-10 p-7
                             transition-all duration-700
@@ -282,13 +291,15 @@ export default function ABTechnologyServices() {
                             <img
                                 src="https://images.unsplash.com/photo-1553413077-190dd305871c?w=1200&q=80"
                                 alt=""
+                                loading="lazy"
+                                decoding="async"
                                 className="h-full w-full object-cover"
                             />
                         </div>
 
                         {/* Gradient orb */}
-                        <div className="pointer-events-none absolute -right-32 -top-32 h-80 w-80 rounded-full bg-blue-500/15 blur-3xl transition-transform duration-700 group-hover:scale-125" />
-                        <div className="pointer-events-none absolute -bottom-20 -left-20 h-64 w-64 rounded-full bg-cyan-500/10 blur-3xl" />
+                        <div className="pointer-events-none absolute hidden lg:block -right-32 -top-32 h-80 w-80 rounded-full bg-blue-500/12 blur-3xl transition-transform duration-500 lg:group-hover:scale-110 motion-reduce:transform-none" />
+                        <div className="pointer-events-none absolute hidden lg:block -bottom-20 -left-20 h-64 w-64 rounded-full bg-cyan-500/10 blur-3xl" />
 
                         <div className="relative">
                             <div className="flex items-start justify-between gap-6">
@@ -329,7 +340,7 @@ export default function ABTechnologyServices() {
                                 ].map((item, i) => (
                                     <div
                                         key={item.title}
-                                        className="group/item relative overflow-hidden rounded-2xl border border-slate-200/80 dark:border-white/10 bg-gradient-to-br from-slate-50 to-white dark:from-white/[0.04] dark:to-white/[0.02] p-5 transition-all duration-300 hover:-translate-y-1 hover:border-blue-500/30 hover:shadow-lg hover:shadow-blue-500/10"
+                                        className="group/item relative overflow-hidden rounded-2xl border border-slate-200/80 dark:border-white/10 bg-gradient-to-br from-slate-50 to-white dark:from-white/[0.04] dark:to-white/[0.02] p-5 transition-colors duration-300 lg:hover:-translate-y-1 lg:hover:border-blue-500/30 lg:hover:shadow-md lg:hover:shadow-blue-500/10 motion-reduce:transform-none"
                                     >
                                         <div className="flex items-start gap-3">
                                             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400">
@@ -383,8 +394,8 @@ export default function ABTechnologyServices() {
                         }}
                     >
                         {/* Ambient glows */}
-                        <div className="pointer-events-none absolute -bottom-32 -right-20 h-72 w-72 rounded-full bg-purple-500/25 blur-3xl" />
-                        <div className="pointer-events-none absolute -top-20 -left-20 h-64 w-64 rounded-full bg-cyan-500/20 blur-3xl" />
+                        <div className="pointer-events-none absolute hidden md:block -bottom-32 -right-20 h-72 w-72 rounded-full bg-purple-500/20 blur-3xl" />
+                        <div className="pointer-events-none absolute hidden md:block -top-20 -left-20 h-64 w-64 rounded-full bg-cyan-500/16 blur-3xl" />
 
                         {/* Grid overlay */}
                         <div className="absolute inset-0 opacity-[0.06] [background-image:linear-gradient(to_right,white_1px,transparent_1px),linear-gradient(to_bottom,white_1px,transparent_1px)] [background-size:32px_32px]" />
@@ -392,7 +403,7 @@ export default function ABTechnologyServices() {
                         <div className="relative">
                             <div className="flex items-center gap-2">
                                 <span className="flex h-2 w-2">
-                                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400 opacity-75" />
+                                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400 opacity-75 motion-reduce:animate-none" />
                                     <span className="relative inline-flex h-2 w-2 rounded-full bg-cyan-400" />
                                 </span>
                                 <span className="text-xs font-bold uppercase tracking-[0.2em] text-cyan-400">
@@ -480,11 +491,11 @@ export default function ABTechnologyServices() {
                             border border-blue-200/60 dark:border-blue-400/10
                             bg-gradient-to-br from-blue-50/80 via-white to-indigo-50/80
                             dark:from-blue-950/40 dark:via-slate-900 dark:to-indigo-950/30
-                            p-8 lg:p-10
-                            backdrop-blur-xl
-                            transition-all duration-700
+                            p-7 sm:p-8 lg:p-10
+                            lg:backdrop-blur-md
+                            transition-all duration-500
                             opacity-0 translate-y-8
-                            hover:shadow-[0_30px_80px_-20px_rgba(59,130,246,0.25)]
+                            lg:hover:shadow-[0_24px_60px_-20px_rgba(59,130,246,0.20)]
                         "
                         style={{
                             opacity: visibleItems.has("software") ? 1 : 0,
@@ -492,8 +503,8 @@ export default function ABTechnologyServices() {
                             transition: "opacity 0.7s ease, transform 0.7s ease",
                         }}
                     >
-                        <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-blue-500/15 blur-3xl transition-transform duration-700 group-hover:scale-125" />
-                        <div className="pointer-events-none absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-indigo-500/10 blur-3xl" />
+                        <div className="pointer-events-none absolute hidden lg:block -right-24 -top-24 h-64 w-64 rounded-full bg-blue-500/12 blur-3xl transition-transform duration-500 lg:group-hover:scale-110 motion-reduce:transform-none" />
+                        <div className="pointer-events-none absolute hidden lg:block -bottom-24 -left-24 h-64 w-64 rounded-full bg-indigo-500/10 blur-3xl" />
 
                         <div className="relative">
                             <div className="flex items-center justify-between">
@@ -536,7 +547,7 @@ export default function ABTechnologyServices() {
                                     return (
                                         <div
                                             key={item.name}
-                                            className="group/soft flex items-center gap-3 rounded-xl border border-blue-100/80 dark:border-white/10 bg-white/70 dark:bg-white/[0.04] p-3.5 text-sm font-semibold text-slate-700 dark:text-slate-300 transition-all duration-300 hover:border-blue-500/40 hover:bg-white hover:shadow-md hover:shadow-blue-500/10 hover:-translate-y-0.5"
+                                            className="group/soft flex items-center gap-3 rounded-xl border border-blue-100/80 dark:border-white/10 bg-white/70 dark:bg-white/[0.04] p-3.5 text-sm font-semibold text-slate-700 dark:text-slate-300 transition-all duration-300 hover:border-blue-500/40 hover:bg-white lg:hover:shadow-md lg:hover:shadow-blue-500/10 lg:hover:-translate-y-0.5 motion-reduce:transform-none"
                                             style={{
                                                 animation: visibleItems.has("software")
                                                     ? `slideIn 0.5s ease ${i * 0.06}s both`
@@ -562,11 +573,11 @@ export default function ABTechnologyServices() {
                             border border-purple-200/60 dark:border-purple-400/10
                             bg-gradient-to-br from-purple-50/80 via-white to-cyan-50/80
                             dark:from-purple-950/40 dark:via-slate-900 dark:to-cyan-950/30
-                            p-8 lg:p-10
-                            backdrop-blur-xl
-                            transition-all duration-700
+                            p-7 sm:p-8 lg:p-10
+                            lg:backdrop-blur-md
+                            transition-all duration-500
                             opacity-0 translate-y-8
-                            hover:shadow-[0_30px_80px_-20px_rgba(168,85,247,0.25)]
+                            lg:hover:shadow-[0_24px_60px_-20px_rgba(168,85,247,0.20)]
                         "
                         style={{
                             opacity: visibleItems.has("ai") ? 1 : 0,
@@ -574,8 +585,8 @@ export default function ABTechnologyServices() {
                             transition: "opacity 0.7s ease 0.15s, transform 0.7s ease 0.15s",
                         }}
                     >
-                        <div className="pointer-events-none absolute -bottom-24 -right-24 h-64 w-64 rounded-full bg-purple-500/15 blur-3xl transition-transform duration-700 group-hover:scale-125" />
-                        <div className="pointer-events-none absolute -top-24 -left-24 h-64 w-64 rounded-full bg-cyan-500/10 blur-3xl" />
+                        <div className="pointer-events-none absolute hidden lg:block -bottom-24 -right-24 h-64 w-64 rounded-full bg-purple-500/12 blur-3xl transition-transform duration-500 lg:group-hover:scale-110 motion-reduce:transform-none" />
+                        <div className="pointer-events-none absolute hidden lg:block -top-24 -left-24 h-64 w-64 rounded-full bg-cyan-500/10 blur-3xl" />
 
                         <div className="relative">
                             <div className="flex items-center justify-between">
@@ -583,7 +594,7 @@ export default function ABTechnologyServices() {
                                     <div className="relative flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600 text-white shadow-xl shadow-purple-500/30">
                                         <Cpu className="h-7 w-7" />
                                         <span className="absolute -right-1 -top-1 flex h-3 w-3">
-                                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400 opacity-75" />
+                                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400 opacity-75 motion-reduce:animate-none" />
                                             <span className="relative inline-flex h-3 w-3 rounded-full bg-cyan-400" />
                                         </span>
                                     </div>
@@ -622,7 +633,7 @@ export default function ABTechnologyServices() {
                                     return (
                                         <div
                                             key={item.name}
-                                            className="group/ai flex items-center gap-3 rounded-xl border border-purple-100/80 dark:border-white/10 bg-white/70 dark:bg-white/[0.04] p-3.5 text-sm font-semibold text-slate-700 dark:text-slate-300 transition-all duration-300 hover:border-purple-500/40 hover:bg-white hover:shadow-md hover:shadow-purple-500/10 hover:-translate-y-0.5"
+                                            className="group/ai flex items-center gap-3 rounded-xl border border-purple-100/80 dark:border-white/10 bg-white/70 dark:bg-white/[0.04] p-3.5 text-sm font-semibold text-slate-700 dark:text-slate-300 transition-all duration-300 hover:border-purple-500/40 hover:bg-white lg:hover:shadow-md lg:hover:shadow-purple-500/10 lg:hover:-translate-y-0.5 motion-reduce:transform-none"
                                             style={{
                                                 animation: visibleItems.has("ai")
                                                     ? `slideIn 0.5s ease ${i * 0.06}s both`
@@ -649,9 +660,9 @@ export default function ABTechnologyServices() {
                         border border-emerald-200/60 dark:border-emerald-400/10
                         bg-gradient-to-br from-emerald-50/70 via-white to-cyan-50/70
                         dark:from-emerald-950/30 dark:via-slate-900 dark:to-cyan-950/30
-                        p-8 lg:p-12
-                        backdrop-blur-xl
-                        transition-all duration-700
+                        p-7 sm:p-8 lg:p-12
+                        lg:backdrop-blur-md
+                        transition-all duration-500
                         opacity-0 translate-y-8
                     "
                     style={{
@@ -660,8 +671,8 @@ export default function ABTechnologyServices() {
                         transition: "opacity 0.7s ease, transform 0.7s ease",
                     }}
                 >
-                    <div className="pointer-events-none absolute -left-32 -top-32 h-80 w-80 rounded-full bg-emerald-500/15 blur-3xl" />
-                    <div className="pointer-events-none absolute -bottom-32 -right-32 h-80 w-80 rounded-full bg-cyan-500/15 blur-3xl" />
+                    <div className="pointer-events-none absolute hidden lg:block -left-32 -top-32 h-80 w-80 rounded-full bg-emerald-500/12 blur-3xl" />
+                    <div className="pointer-events-none absolute hidden lg:block -bottom-32 -right-32 h-80 w-80 rounded-full bg-cyan-500/12 blur-3xl" />
 
                     <div className="relative grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:items-center">
 
@@ -706,7 +717,7 @@ export default function ABTechnologyServices() {
                                 ].map((tag) => (
                                     <span
                                         key={tag.label}
-                                        className="rounded-full border border-slate-200 dark:border-white/10 bg-white/80 dark:bg-white/[0.04] px-4 py-2 text-xs font-bold text-slate-700 dark:text-slate-300 backdrop-blur-sm transition-all hover:scale-105"
+                                        className="rounded-full border border-slate-200 dark:border-white/10 bg-white/80 dark:bg-white/[0.04] px-4 py-2 text-xs font-bold text-slate-700 dark:text-slate-300 lg:backdrop-blur-sm transition-colors lg:hover:scale-105 motion-reduce:transform-none"
                                     >
                                         {tag.label}
                                     </span>
@@ -752,7 +763,7 @@ export default function ABTechnologyServices() {
                                 return (
                                     <div
                                         key={item.title}
-                                        className="group/card relative overflow-hidden rounded-3xl border border-slate-200/80 dark:border-white/10 bg-white/80 dark:bg-white/[0.04] p-6 backdrop-blur-sm transition-all duration-500 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-slate-950/10 dark:hover:shadow-black/40"
+                                        className="group/card relative overflow-hidden rounded-3xl border border-slate-200/80 dark:border-white/10 bg-white/80 dark:bg-white/[0.04] p-6 lg:backdrop-blur-sm transition-shadow duration-300 lg:hover:-translate-y-1 lg:hover:shadow-xl lg:hover:shadow-slate-950/10 dark:lg:hover:shadow-black/40 motion-reduce:transform-none"
                                         style={{
                                             animation: visibleItems.has("training")
                                                 ? `slideIn 0.6s ease ${i * 0.1}s both`
@@ -760,10 +771,10 @@ export default function ABTechnologyServices() {
                                         }}
                                     >
                                         {/* Hover glow */}
-                                        <div className={`pointer-events-none absolute -right-12 -top-12 h-32 w-32 rounded-full ${accent.bg} blur-2xl opacity-0 transition-opacity duration-500 group-hover/card:opacity-100`} />
+                                        <div className={`pointer-events-none absolute hidden lg:block -right-12 -top-12 h-32 w-32 rounded-full ${accent.bg} blur-2xl opacity-0 transition-opacity duration-500 group-hover/card:opacity-100`} />
 
                                         <div className="relative">
-                                            <div className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${accent.icon} text-white shadow-lg transition-all duration-500 group-hover/card:scale-110 group-hover/card:rotate-3`}>
+                                            <div className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${accent.icon} text-white shadow-lg transition-all duration-500 lg:group-hover/card:scale-110 lg:group-hover/card:rotate-3 motion-reduce:transform-none`}>
                                                 <Icon className="h-6 w-6" />
                                             </div>
 
@@ -805,9 +816,9 @@ export default function ABTechnologyServices() {
                     }}
                 >
                     {/* Glows */}
-                    <div className="pointer-events-none absolute -right-24 -top-40 h-80 w-80 rounded-full bg-blue-500/30 blur-3xl animate-pulse" />
-                    <div className="pointer-events-none absolute -bottom-40 left-1/3 h-80 w-80 rounded-full bg-purple-500/30 blur-3xl animate-pulse" />
-                    <div className="pointer-events-none absolute top-1/2 right-1/4 h-64 w-64 rounded-full bg-cyan-500/20 blur-3xl" />
+                    <div className="pointer-events-none absolute hidden md:block -right-24 -top-40 h-80 w-80 rounded-full bg-blue-500/25 blur-3xl lg:animate-pulse motion-reduce:animate-none" />
+                    <div className="pointer-events-none absolute hidden lg:block -bottom-40 left-1/3 h-80 w-80 rounded-full bg-purple-500/25 blur-3xl lg:animate-pulse motion-reduce:animate-none" />
+                    <div className="pointer-events-none absolute hidden lg:block top-1/2 right-1/4 h-64 w-64 rounded-full bg-cyan-500/16 blur-3xl" />
 
                     {/* Grid */}
                     <div className="absolute inset-0 opacity-[0.05] [background-image:linear-gradient(to_right,white_1px,transparent_1px),linear-gradient(to_bottom,white_1px,transparent_1px)] [background-size:40px_40px]" />
@@ -850,7 +861,7 @@ export default function ABTechnologyServices() {
                         <div className="flex flex-col gap-4 sm:flex-row lg:flex-col">
                             <a
                                 href="/support"
-                                className="group/btn relative inline-flex items-center justify-center gap-3 overflow-hidden rounded-2xl bg-white px-7 py-4 text-sm font-bold text-slate-950 shadow-2xl shadow-white/10 transition-all duration-300 hover:-translate-y-1 hover:shadow-white/20"
+                                className="group/btn relative inline-flex items-center justify-center gap-3 overflow-hidden rounded-2xl bg-white px-7 py-4 text-sm font-bold text-slate-950 shadow-2xl shadow-white/10 transition-all duration-300 lg:hover:-translate-y-1 lg:hover:shadow-white/20 motion-reduce:transform-none"
                             >
                                 <span className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 opacity-0 transition-opacity duration-300 group-hover/btn:opacity-100" />
                                 <span className="relative flex items-center gap-3 transition-colors duration-300 group-hover/btn:text-white">
@@ -861,7 +872,7 @@ export default function ABTechnologyServices() {
 
                             <a
                                 href="/services"
-                                className="group/btn2 inline-flex items-center justify-center gap-3 rounded-2xl border border-white/20 bg-white/5 px-7 py-4 text-sm font-bold text-white backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-white/40 hover:bg-white/10"
+                                className="group/btn2 inline-flex items-center justify-center gap-3 rounded-2xl border border-white/20 bg-white/5 px-7 py-4 text-sm font-bold text-white lg:backdrop-blur-sm transition-all duration-300 lg:hover:-translate-y-1 motion-reduce:transform-none hover:border-white/40 hover:bg-white/10"
                             >
                                 <Play className="h-4 w-4" />
                                 Explore All Services
@@ -874,6 +885,12 @@ export default function ABTechnologyServices() {
 
             {/* Custom keyframes */}
             <style jsx>{`
+                @media (prefers-reduced-motion: reduce) {
+                    * {
+                        scroll-behavior: auto !important;
+                    }
+                }
+
                 @keyframes slideIn {
                     from {
                         opacity: 0;

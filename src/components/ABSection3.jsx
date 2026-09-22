@@ -90,7 +90,9 @@ export default function ABSection3() {
             className="
                 relative isolate overflow-hidden
                 bg-slate-50
-                py-24
+                py-20
+                [content-visibility:auto]
+                [contain-intrinsic-size:1px_2200px]
                 text-slate-950
                 transition-colors
                 duration-500
@@ -108,6 +110,8 @@ export default function ABSection3() {
                 <div
                     className="
                         absolute
+                        hidden
+                        md:block
                         -right-[18%]
                         top-[5%]
                         h-[600px]
@@ -123,6 +127,8 @@ export default function ABSection3() {
                 <div
                     className="
                         absolute
+                        hidden
+                        md:block
                         -bottom-[20%]
                         -left-[15%]
                         h-[600px]
@@ -138,6 +144,8 @@ export default function ABSection3() {
                 <div
                     className="
                         absolute
+                        hidden
+                        lg:block
                         left-1/2
                         top-1/2
                         h-[500px]
@@ -214,7 +222,7 @@ export default function ABSection3() {
                         "
                     >
                         <span className="relative flex h-2 w-2">
-                            <span className="absolute h-full w-full animate-ping rounded-full bg-emerald-500/50" />
+                            <span className="absolute h-full w-full animate-ping rounded-full bg-emerald-500/50 motion-reduce:animate-none" />
                             <span className="relative h-2 w-2 rounded-full bg-emerald-500" />
                         </span>
 
@@ -362,10 +370,11 @@ export default function ABSection3() {
                                         rounded-2xl
                                         border
                                         border-slate-200/80
-                                        bg-white/60
+                                        bg-white
                                         px-4
                                         py-3
-                                        backdrop-blur
+                                        md:bg-white/70
+                                        lg:backdrop-blur-sm
                                         dark:border-white/[0.08]
                                         dark:bg-white/[0.025]
                                     "
@@ -461,7 +470,9 @@ export default function ABSection3() {
                                 shadow-[0_15px_40px_rgba(15,23,42,0.18)]
                                 transition-all
                                 duration-300
-                                hover:-translate-y-1
+                                lg:hover:-translate-y-1
+                                motion-reduce:transform-none
+                                motion-reduce:transition-none
                                 hover:bg-blue-600
                                 hover:shadow-[0_20px_50px_rgba(37,99,235,0.25)]
                                 dark:bg-white
@@ -488,13 +499,15 @@ export default function ABSection3() {
                         RIGHT VISUAL
                     ===================================================== */}
 
-                    <div className="relative min-h-[570px]">
+                    <div className="relative min-h-[430px] sm:min-h-[520px] lg:min-h-[570px]">
 
                         {/* Ambient glow */}
 
                         <div
                             className="
                                 absolute
+                                hidden
+                                md:block
                                 left-1/2
                                 top-1/2
                                 h-[360px]
@@ -527,12 +540,15 @@ export default function ABSection3() {
                                 rounded-[2.5rem]
                                 border
                                 border-blue-500/20
-                                bg-white/80
-                                shadow-[0_30px_100px_rgba(37,99,235,0.16)]
-                                backdrop-blur-2xl
+                                bg-white
+                                shadow-[0_16px_45px_rgba(37,99,235,0.10)]
+                                md:bg-white/85
+                                lg:backdrop-blur-xl
+                                lg:shadow-[0_30px_100px_rgba(37,99,235,0.16)]
                                 dark:border-white/10
-                                dark:bg-slate-900/80
-                                dark:shadow-[0_30px_100px_rgba(37,99,235,0.15)]
+                                dark:bg-slate-900
+                                lg:dark:bg-slate-900/80
+                                lg:dark:shadow-[0_30px_100px_rgba(37,99,235,0.15)]
                             "
                         >
                             {/* rotating ring */}
@@ -541,8 +557,9 @@ export default function ABSection3() {
                                 className="
                                     absolute
                                     inset-[-15px]
-                                    animate-[spin_18s_linear_infinite]
                                     rounded-[3rem]
+                                    md:animate-[spin_18s_linear_infinite]
+                                    motion-reduce:animate-none
                                     border
                                     border-dashed
                                     border-blue-500/20
@@ -607,6 +624,8 @@ export default function ABSection3() {
                             className="
                                 pointer-events-none
                                 absolute
+                                hidden
+                                sm:block
                                 left-1/2
                                 top-1/2
                                 h-[420px]
@@ -705,11 +724,11 @@ export default function ABSection3() {
                                 bg-white/75
                                 px-4
                                 py-3
-                                shadow-xl
-                                backdrop-blur-xl
+                                shadow-lg
                                 dark:border-white/[0.08]
                                 dark:bg-slate-900/70
-                                sm:block
+                                md:block
+                                lg:backdrop-blur-md
                             "
                         >
                             <div className="flex items-center gap-3">
@@ -755,13 +774,16 @@ export default function ABSection3() {
                                 rounded-[2rem]
                                 border
                                 border-slate-200/80
-                                bg-white/85
+                                bg-white
                                 p-4
-                                shadow-[0_25px_80px_rgba(15,23,42,0.12)]
-                                backdrop-blur-2xl
+                                shadow-[0_14px_40px_rgba(15,23,42,0.10)]
+                                md:bg-white/90
+                                lg:backdrop-blur-xl
+                                lg:shadow-[0_25px_80px_rgba(15,23,42,0.12)]
                                 dark:border-white/[0.08]
-                                dark:bg-slate-900/80
-                                dark:shadow-[0_25px_80px_rgba(0,0,0,0.35)]
+                                dark:bg-slate-900
+                                lg:dark:bg-slate-900/80
+                                lg:dark:shadow-[0_25px_80px_rgba(0,0,0,0.35)]
                                 sm:w-[80%]
                             "
                         >
@@ -925,14 +947,17 @@ export default function ABSection3() {
                                         rounded-[2rem]
                                         border
                                         border-slate-200/80
-                                        bg-white/70
+                                        bg-white
                                         p-6
-                                        shadow-[0_15px_60px_rgba(15,23,42,0.05)]
-                                        backdrop-blur-xl
-                                        transition-all
-                                        duration-500
-                                        hover:-translate-y-2
-                                        hover:shadow-[0_25px_70px_rgba(15,23,42,0.10)]
+                                        shadow-sm
+                                        transition-shadow
+                                        duration-300
+                                        md:bg-white/80
+                                        lg:backdrop-blur-md
+                                        lg:hover:-translate-y-1
+                                        lg:hover:shadow-[0_20px_55px_rgba(15,23,42,0.08)]
+                                        motion-reduce:transform-none
+                                        motion-reduce:transition-none
                                         dark:border-white/[0.08]
                                         dark:bg-white/[0.025]
                                         dark:shadow-[0_20px_60px_rgba(0,0,0,0.18)]
@@ -945,6 +970,8 @@ export default function ABSection3() {
                                         className={`
                                             pointer-events-none
                                             absolute
+                                            hidden
+                                            lg:block
                                             -right-16
                                             -top-16
                                             h-40
@@ -1007,8 +1034,9 @@ export default function ABSection3() {
                                             ${styles.icon}
                                             transition-all
                                             duration-500
-                                            group-hover:scale-110
-                                            group-hover:rotate-3
+                                            lg:group-hover:scale-110
+                                            lg:group-hover:rotate-3
+                                            motion-reduce:transform-none
                                         `}
                                     >
                                         <Icon className="h-5 w-5" />
@@ -1100,10 +1128,11 @@ export default function ABSection3() {
                         rounded-[2rem]
                         border
                         border-slate-200/80
-                        bg-white/50
+                        bg-white
                         px-6
                         py-6
-                        backdrop-blur-xl
+                        md:bg-white/70
+                        lg:backdrop-blur-md
                         dark:border-white/[0.08]
                         dark:bg-white/[0.025]
                         sm:px-8
@@ -1172,6 +1201,7 @@ export default function ABSection3() {
                                         h-full
                                         w-full
                                         animate-ping
+                                        motion-reduce:animate-none
                                         rounded-full
                                         bg-emerald-500/40
                                     "
@@ -1201,7 +1231,7 @@ function FloatingIcon({ icon: Icon, label, position }) {
                 ${position}
                 z-10
                 hidden
-                sm:block
+                md:block
             `}
         >
             <div
@@ -1216,11 +1246,13 @@ function FloatingIcon({ icon: Icon, label, position }) {
                     bg-white/75
                     px-3
                     py-2.5
-                    shadow-xl
-                    backdrop-blur-xl
+                    shadow-lg
+                    lg:backdrop-blur-md
                     transition-all
-                    duration-500
-                    hover:-translate-y-1
+                    duration-300
+                    lg:hover:-translate-y-1
+                    motion-reduce:transform-none
+                    motion-reduce:transition-none
                     hover:border-blue-500/20
                     dark:border-white/[0.08]
                     dark:bg-slate-900/70
@@ -1238,7 +1270,8 @@ function FloatingIcon({ icon: Icon, label, position }) {
                         text-blue-500
                         transition-transform
                         duration-500
-                        group-hover:scale-110
+                        lg:group-hover:scale-110
+                        motion-reduce:transform-none
                     "
                 >
                     <Icon className="h-4 w-4" />

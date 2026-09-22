@@ -107,6 +107,10 @@ export default function TechnologyPartnerSection() {
     return (
         <section
             id="technology-partner"
+            style={{
+                contentVisibility: "auto",
+                containIntrinsicSize: "1px 1800px",
+            }}
             className="
                 relative
                 overflow-hidden
@@ -165,11 +169,16 @@ export default function TechnologyPartnerSection() {
                     absolute
                     left-[-180px]
                     top-[15%]
-                    h-[500px]
-                    w-[500px]
+                    hidden
+                    h-[360px]
+                    w-[360px]
                     rounded-full
                     bg-sky-400/10
-                    blur-[120px]
+                    blur-[70px]
+                    md:block
+                    lg:h-[500px]
+                    lg:w-[500px]
+                    lg:blur-[120px]
                     dark:bg-sky-500/[0.06]
                 "
             />
@@ -180,11 +189,16 @@ export default function TechnologyPartnerSection() {
                     absolute
                     right-[-180px]
                     bottom-[5%]
-                    h-[500px]
-                    w-[500px]
+                    hidden
+                    h-[360px]
+                    w-[360px]
                     rounded-full
                     bg-purple-400/10
-                    blur-[120px]
+                    blur-[70px]
+                    md:block
+                    lg:h-[500px]
+                    lg:w-[500px]
+                    lg:blur-[120px]
                     dark:bg-purple-500/[0.05]
                 "
             />
@@ -306,9 +320,11 @@ export default function TechnologyPartnerSection() {
                                     border-slate-200
                                     bg-white
                                     p-6
-                                    transition-all
-                                    duration-500
-                                    hover:-translate-y-1
+                                    transition-colors
+                                    duration-300
+                                    md:transition-all
+                                    md:duration-500
+                                    motion-safe:md:hover:-translate-y-1
                                     hover:border-slate-300
                                     hover:bg-slate-50
                                     dark:border-white/[0.07]
@@ -326,11 +342,13 @@ export default function TechnologyPartnerSection() {
                                         absolute
                                         -right-20
                                         -top-20
+                                        hidden
                                         h-40
                                         w-40
                                         rounded-full
-                                        blur-[70px]
+                                        blur-[60px]
                                         opacity-0
+                                        md:block
                                         transition-opacity
                                         duration-500
                                         group-hover:opacity-100
@@ -491,7 +509,7 @@ export default function TechnologyPartnerSection() {
                                             className="
                                                 transition-transform
                                                 duration-300
-                                                group-hover:translate-x-1
+                                                motion-safe:group-hover:translate-x-1
                                             "
                                         />
                                     </div>
@@ -620,9 +638,12 @@ export default function TechnologyPartnerSection() {
                             className="
                                 absolute
                                 -inset-4
+                                hidden
                                 rounded-[2rem]
                                 bg-sky-400/10
-                                blur-2xl
+                                blur-xl
+                                md:block
+                                lg:blur-2xl
                                 dark:bg-sky-500/[0.035]
                             "
                         />
@@ -635,10 +656,12 @@ export default function TechnologyPartnerSection() {
                                 border
                                 border-slate-200
                                 bg-white
-                                shadow-[0_35px_100px_rgba(0,0,0,0.1)]
+                                shadow-[0_18px_45px_rgba(0,0,0,0.08)]
+                                lg:shadow-[0_35px_100px_rgba(0,0,0,0.1)]
                                 dark:border-white/[0.09]
                                 dark:bg-[#050a14]
-                                dark:shadow-[0_35px_100px_rgba(0,0,0,.4)]
+                                dark:shadow-[0_18px_45px_rgba(0,0,0,.25)]
+                                lg:dark:shadow-[0_35px_100px_rgba(0,0,0,.4)]
                             "
                         >
                             {/* Browser header */}
@@ -863,7 +886,7 @@ export default function TechnologyPartnerSection() {
                                                             text-slate-400
                                                             transition-all
                                                             duration-300
-                                                            group-hover/journey:translate-x-1
+                                                            motion-safe:group-hover/journey:translate-x-1
                                                             group-hover/journey:text-slate-600
                                                             dark:text-slate-700
                                                             dark:group-hover/journey:text-slate-400
@@ -939,11 +962,11 @@ export default function TechnologyPartnerSection() {
                                         transition-all
                                         duration-300
                                         hover:bg-sky-700
-                                        hover:shadow-[0_0_30px_rgba(0,0,0,0.1)]
+                                        md:hover:shadow-[0_0_30px_rgba(0,0,0,0.1)]
                                         dark:bg-white
                                         dark:text-slate-950
                                         dark:hover:bg-sky-50
-                                        dark:hover:shadow-[0_0_30px_rgba(255,255,255,.1)]
+                                        md:dark:hover:shadow-[0_0_30px_rgba(255,255,255,.1)]
                                     "
                                 >
                                     Start a Conversation
@@ -1102,7 +1125,7 @@ export default function TechnologyPartnerSection() {
                                 className="
                                     transition-transform
                                     duration-300
-                                    group-hover:translate-x-1
+                                    motion-safe:group-hover:translate-x-1
                                 "
                             />
                         </a>

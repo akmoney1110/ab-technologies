@@ -275,8 +275,9 @@ function ServiceIcon({ service, large = false }) {
                 ${style.icon}
                 transition-all
                 duration-500
-                group-hover:scale-110
-                group-hover:rotate-2
+                lg:group-hover:scale-110
+                lg:group-hover:rotate-2
+                motion-reduce:transform-none
             `}
         >
             <Icon
@@ -328,7 +329,9 @@ export default function ServicesSection() {
                 border-y
                 border-slate-200/70
                 bg-slate-50
-                py-24
+                py-20
+                [content-visibility:auto]
+                [contain-intrinsic-size:1px_3200px]
                 dark:border-white/[0.06]
                 dark:bg-[#020611]
                 sm:py-28
@@ -343,6 +346,8 @@ export default function ServicesSection() {
                 <div
                     className="
                         absolute
+                        hidden
+                        md:block
                         -left-40
                         -top-40
                         h-[560px]
@@ -357,6 +362,8 @@ export default function ServicesSection() {
                 <div
                     className="
                         absolute
+                        hidden
+                        md:block
                         right-[-220px]
                         top-[20%]
                         h-[650px]
@@ -371,6 +378,8 @@ export default function ServicesSection() {
                 <div
                     className="
                         absolute
+                        hidden
+                        lg:block
                         bottom-[-260px]
                         left-[25%]
                         h-[600px]
@@ -570,13 +579,17 @@ export default function ServicesSection() {
                         rounded-[36px]
                         border
                         border-slate-200/80
-                        bg-white/70
+                        bg-white
                         p-4
-                        shadow-[0_30px_100px_rgba(15,23,42,0.08)]
-                        backdrop-blur-2xl
+                        shadow-sm
+                        md:bg-white/85
+                        md:shadow-[0_20px_60px_rgba(15,23,42,0.07)]
+                        lg:backdrop-blur-xl
                         dark:border-white/[0.08]
-                        dark:bg-white/[0.025]
-                        dark:shadow-[0_30px_100px_rgba(0,0,0,0.25)]
+                        dark:bg-[#07101f]
+                        dark:shadow-none
+                        md:dark:bg-white/[0.025]
+                        md:dark:shadow-[0_20px_60px_rgba(0,0,0,0.20)]
                         sm:p-6
                         lg:p-8
                     "
@@ -585,6 +598,8 @@ export default function ServicesSection() {
                         className="
                             pointer-events-none
                             absolute
+                            hidden
+                            md:block
                             -right-32
                             -top-32
                             h-[400px]
@@ -599,6 +614,8 @@ export default function ServicesSection() {
                         className="
                             pointer-events-none
                             absolute
+                            hidden
+                            md:block
                             bottom-[-150px]
                             left-[30%]
                             h-[350px]
@@ -800,7 +817,8 @@ export default function ServicesSection() {
                                             bg-gradient-to-br
                                             from-blue-500/20
                                             to-indigo-500/10
-                                            shadow-[0_0_70px_rgba(59,130,246,0.25)]
+                                            shadow-[0_0_28px_rgba(59,130,246,0.16)]
+                            md:shadow-[0_0_70px_rgba(59,130,246,0.25)]
                                         "
                                     >
                                         <Cpu
@@ -1190,13 +1208,16 @@ export default function ServicesSection() {
                             rounded-[32px]
                             border
                             border-orange-200/70
-                            bg-white/80
+                            bg-white
                             shadow-sm
-                            backdrop-blur-xl
-                            transition-all
-                            duration-500
-                            hover:-translate-y-1
-                            hover:shadow-2xl
+                            transition-shadow
+                            duration-300
+                            md:bg-white/85
+                            lg:backdrop-blur-lg
+                            lg:hover:-translate-y-1
+                            lg:hover:shadow-xl
+                            motion-reduce:transform-none
+                            motion-reduce:transition-none
                             dark:border-orange-500/10
                             dark:bg-white/[0.035]
                         "
@@ -1204,6 +1225,8 @@ export default function ServicesSection() {
                         <div
                             className="
                                 absolute
+                                hidden
+                                md:block
                                 -right-20
                                 -top-20
                                 h-72
@@ -1383,6 +1406,8 @@ export default function ServicesSection() {
                                 <div
                                     className="
                                         absolute
+                                        hidden
+                                        md:block
                                         right-[-80px]
                                         top-[-80px]
                                         h-72
@@ -1406,9 +1431,11 @@ export default function ServicesSection() {
                                             bg-white/[0.05]
                                             shadow-2xl
                                             transition-transform
-                                            duration-700
-                                            group-hover:scale-[1.02]
-                                            group-hover:-rotate-1
+                                            duration-500
+                                            lg:group-hover:scale-[1.02]
+                                            lg:group-hover:-rotate-1
+                                            motion-reduce:transform-none
+                                            motion-reduce:transition-none
                                         "
                                     >
                                         <div
@@ -1482,8 +1509,8 @@ export default function ServicesSection() {
                                             bg-slate-900/90
                                             px-4
                                             py-3
-                                            shadow-xl
-                                            backdrop-blur-xl
+                                            shadow-lg
+                                            md:backdrop-blur-md
                                         "
                                     >
                                         <p className="text-[8px] uppercase tracking-[0.2em] text-slate-500">
@@ -1524,14 +1551,17 @@ export default function ServicesSection() {
                                         rounded-[28px]
                                         border
                                         border-slate-200/80
-                                        bg-white/75
+                                        bg-white
                                         p-6
                                         shadow-sm
-                                        backdrop-blur-xl
-                                        transition-all
-                                        duration-500
-                                        hover:-translate-y-2
-                                        hover:shadow-xl
+                                        transition-shadow
+                                        duration-300
+                                        md:bg-white/80
+                                        lg:backdrop-blur-md
+                                        lg:hover:-translate-y-1
+                                        lg:hover:shadow-lg
+                                        motion-reduce:transform-none
+                                        motion-reduce:transition-none
                                         dark:border-white/[0.07]
                                         dark:bg-white/[0.03]
                                         ${style.border}
@@ -1541,6 +1571,8 @@ export default function ServicesSection() {
                                         className={`
                                             pointer-events-none
                                             absolute
+                                            hidden
+                                            lg:block
                                             -right-20
                                             -top-20
                                             h-44
@@ -1787,12 +1819,15 @@ export default function ServicesSection() {
                                     rounded-2xl
                                     border
                                     border-slate-200/80
-                                    bg-white/70
+                                    bg-white
                                     p-5
-                                    backdrop-blur-xl
-                                    transition-all
+                                    transition-colors
                                     duration-300
-                                    hover:-translate-y-1
+                                    md:bg-white/80
+                                    lg:backdrop-blur-md
+                                    lg:hover:-translate-y-1
+                                    motion-reduce:transform-none
+                                    motion-reduce:transition-none
                                     hover:border-blue-300
                                     dark:border-white/[0.07]
                                     dark:bg-white/[0.025]
@@ -1892,6 +1927,8 @@ export default function ServicesSection() {
                         className="
                             pointer-events-none
                             absolute
+                            hidden
+                            md:block
                             -right-32
                             -top-40
                             h-[450px]
@@ -1906,6 +1943,8 @@ export default function ServicesSection() {
                         className="
                             pointer-events-none
                             absolute
+                            hidden
+                            lg:block
                             -bottom-40
                             left-[20%]
                             h-[350px]
