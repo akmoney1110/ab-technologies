@@ -1,0 +1,842 @@
+/* =========================================================
+   HERO GRID
+========================================================= */
+
+.tech-grid {
+    background-image:
+        linear-gradient(rgba(20, 90, 255, 0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(20, 90, 255, 0.045) 1px, transparent 1px);
+
+    background-size: 55px 55px;
+
+    mask-image: radial-gradient(ellipse at center,
+            black 20%,
+            transparent 80%);
+}
+
+
+/* =========================================================
+     PARTICLES
+  ========================================================= */
+
+.hero-particle {
+    position: absolute;
+    display: block;
+
+    border-radius: 999px;
+
+    background: #3b82f6;
+
+    box-shadow:
+        0 0 5px rgba(37, 99, 235, 0.9),
+        0 0 14px rgba(37, 99, 235, 0.4);
+
+    animation: particleFloat linear infinite;
+}
+
+@keyframes particleFloat {
+
+    0% {
+        transform: translate3d(0, 0, 0);
+        opacity: .1;
+    }
+
+    25% {
+        opacity: .8;
+    }
+
+    50% {
+        transform: translate3d(25px, -35px, 0);
+        opacity: .45;
+    }
+
+    75% {
+        opacity: .9;
+    }
+
+    100% {
+        transform: translate3d(-15px, -70px, 0);
+        opacity: .05;
+    }
+
+}
+
+
+/* =========================================================
+     3D SCENE
+  ========================================================= */
+
+.orbit-system {
+
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    width: 620px;
+    height: 500px;
+
+    transform:
+        translate(-50%, -45%) perspective(1200px);
+
+}
+
+
+/* =========================================================
+     BLUE ATMOSPHERE
+  ========================================================= */
+
+.orbit-glow {
+
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    width: 390px;
+    height: 300px;
+
+    transform: translate(-50%, -50%);
+
+    background:
+        radial-gradient(ellipse,
+            rgba(0, 89, 255, .27),
+            rgba(0, 46, 160, .12) 35%,
+            transparent 70%);
+
+    filter: blur(35px);
+
+}
+
+
+/* =========================================================
+     ORBIT RINGS
+  ========================================================= */
+
+.orbit {
+
+    position: absolute;
+
+    left: 50%;
+    top: 44%;
+
+    width: 470px;
+    height: 175px;
+
+    transform:
+        translate(-50%, -50%) rotateX(63deg) rotateZ(-8deg);
+
+    border-radius: 50%;
+
+    pointer-events: none;
+
+}
+
+
+.orbit-main {
+
+    border: 3px solid rgba(38, 111, 255, .9);
+
+    box-shadow:
+
+        0 0 5px #1767ff,
+
+        0 0 15px rgba(15, 91, 255, .9),
+
+        0 0 35px rgba(15, 91, 255, .55),
+
+        inset 0 0 10px rgba(30, 105, 255, .6);
+
+    animation: orbitSpin 12s linear infinite;
+
+}
+
+
+.orbit-back {
+
+    width: 500px;
+    height: 195px;
+
+    border: 1px solid rgba(31, 100, 255, .25);
+
+    filter: blur(.5px);
+
+}
+
+
+@keyframes orbitSpin {
+
+    from {
+        transform:
+            translate(-50%, -50%) rotateX(63deg) rotateZ(-8deg) rotateZ(0deg);
+    }
+
+    to {
+        transform:
+            translate(-50%, -50%) rotateX(63deg) rotateZ(-8deg) rotateZ(360deg);
+    }
+
+}
+
+
+/* =========================================================
+     ORBIT LIGHTS
+  ========================================================= */
+
+.orbit-light {
+
+    position: absolute;
+
+    width: 15px;
+    height: 15px;
+
+    border-radius: 50%;
+
+    background: #8ab4ff;
+
+    box-shadow:
+        0 0 8px #4d91ff,
+        0 0 25px #1468ff,
+        0 0 50px #1468ff;
+
+}
+
+
+.orbit-light-one {
+    left: 17%;
+    top: 5%;
+}
+
+
+.orbit-light-two {
+    right: 12%;
+    bottom: 10%;
+}
+
+
+/* =========================================================
+     AB LOGO
+  ========================================================= */
+
+.ab-logo-3d {
+
+    position: absolute;
+
+    left: 50%;
+    top: 39%;
+
+    width: 310px;
+    height: 150px;
+
+    transform:
+        translate(-50%, -50%) rotateX(8deg) rotateY(-8deg) skewX(-8deg);
+
+    transform-style: preserve-3d;
+
+    z-index: 20;
+
+}
+
+
+/* Main AB */
+.ab-face,
+.ab-depth,
+.ab-highlight {
+
+    position: absolute;
+
+    left: 0;
+    top: 0;
+
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-family:
+        Arial Black,
+        Impact,
+        sans-serif;
+
+    font-size: 170px;
+
+    font-weight: 900;
+
+    font-style: italic;
+
+    letter-spacing: -35px;
+
+    line-height: 1;
+
+}
+
+
+/* =========================================================
+     EXTRUSION
+  ========================================================= */
+
+.ab-depth {
+
+    color: #041b57;
+
+    text-shadow:
+
+        1px 1px 0 #06256e,
+        2px 2px 0 #06256e,
+        3px 3px 0 #06256e,
+        4px 4px 0 #06256e,
+        5px 5px 0 #06256e,
+        6px 6px 0 #06256e,
+        7px 7px 0 #06256e,
+        8px 8px 0 #06256e,
+        9px 9px 0 #06256e,
+        10px 10px 0 #06256e,
+        11px 11px 0 #06256e,
+        12px 12px 0 #06256e;
+
+}
+
+
+.depth-1 {
+    transform: translateZ(-10px) translate(3px, 3px);
+}
+
+.depth-2 {
+    transform: translateZ(-20px) translate(6px, 6px);
+}
+
+.depth-3 {
+    transform: translateZ(-30px) translate(9px, 9px);
+}
+
+.depth-4 {
+    transform: translateZ(-40px) translate(12px, 12px);
+}
+
+.depth-5 {
+    transform: translateZ(-50px) translate(15px, 15px);
+}
+
+
+/* =========================================================
+     LOGO FACE
+  ========================================================= */
+
+.ab-face {
+
+    color: #1558e8;
+
+    z-index: 10;
+
+    background:
+        linear-gradient(145deg,
+            #8eb9ff 0%,
+            #3e83ff 13%,
+            #0752e9 38%,
+            #0033a7 68%,
+            #001d69 100%);
+
+    -webkit-background-clip: text;
+    background-clip: text;
+
+    -webkit-text-fill-color: transparent;
+
+    filter:
+        drop-shadow(0 7px 0 #001f75) drop-shadow(0 15px 18px rgba(0, 46, 180, .65)) drop-shadow(0 0 30px rgba(0, 79, 255, .4));
+
+}
+
+
+/* =========================================================
+     LOGO HIGHLIGHT
+  ========================================================= */
+
+.ab-highlight {
+
+    z-index: 30;
+
+    color: transparent;
+
+    background:
+        linear-gradient(165deg,
+            transparent 10%,
+            rgba(255, 255, 255, .8) 18%,
+            transparent 25%,
+            transparent 100%);
+
+    -webkit-background-clip: text;
+    background-clip: text;
+
+    transform: translate(-3px, -4px);
+
+    opacity: .65;
+
+}
+
+
+/* =========================================================
+     PLATFORM
+  ========================================================= */
+
+.platform {
+
+    position: absolute;
+
+    left: 50%;
+    top: 68%;
+
+    width: 470px;
+    height: 115px;
+
+    transform:
+        translate(-50%, -50%) perspective(500px) rotateX(63deg);
+
+    z-index: 8;
+
+}
+
+
+.platform-top {
+
+    position: absolute;
+
+    width: 100%;
+    height: 100%;
+
+    border-radius: 50%;
+
+    background:
+
+        radial-gradient(ellipse at center,
+            #071d5d 0%,
+            #041445 40%,
+            #020b26 72%,
+            #010617 100%);
+
+    border:
+
+        2px solid rgba(20, 91, 255, .85);
+
+    box-shadow:
+
+        0 0 10px rgba(17, 89, 255, .8),
+
+        0 0 25px rgba(17, 89, 255, .5),
+
+        0 0 60px rgba(17, 89, 255, .3),
+
+        inset 0 0 30px rgba(22, 91, 255, .4);
+
+}
+
+
+.platform-inner-ring {
+
+    position: absolute;
+
+    inset: 14px;
+
+    border-radius: 50%;
+
+    border: 1px solid rgba(66, 130, 255, .4);
+
+}
+
+
+.platform-glow {
+
+    position: absolute;
+
+    inset: 25px;
+
+    border-radius: 50%;
+
+    background: radial-gradient(ellipse,
+            rgba(30, 102, 255, .35),
+            transparent 65%);
+
+    filter: blur(8px);
+
+}
+
+
+.platform-side {
+
+    position: absolute;
+
+    left: 0;
+
+    bottom: -20px;
+
+    width: 100%;
+
+    height: 40px;
+
+    border-radius: 50%;
+
+    background:
+        linear-gradient(#04133b,
+            #010512);
+
+    border-bottom:
+
+        2px solid rgba(17, 80, 230, .8);
+
+    box-shadow:
+        0 12px 30px rgba(0, 0, 0, .7);
+
+}
+
+
+/* =========================================================
+     FLOOR GLOW
+  ========================================================= */
+
+.floor-glow {
+
+    position: absolute;
+
+    left: 50%;
+    top: 78%;
+
+    width: 520px;
+    height: 90px;
+
+    transform: translateX(-50%);
+
+    background:
+        radial-gradient(ellipse,
+            rgba(0, 74, 255, .45),
+            transparent 70%);
+
+    filter: blur(20px);
+
+    z-index: 1;
+
+}
+
+
+/* =========================================================
+     FLOATING ORBS
+  ========================================================= */
+
+.floating-orb {
+
+    position: absolute;
+
+    width: 5px;
+    height: 5px;
+
+    border-radius: 50%;
+
+    background: #60a5ff;
+
+    box-shadow:
+        0 0 8px #3181ff,
+        0 0 20px #1264ff;
+
+    animation: floatingOrb 5s ease-in-out infinite;
+
+}
+
+
+.orb-one {
+    left: 8%;
+    top: 35%;
+}
+
+.orb-two {
+    right: 8%;
+    top: 22%;
+    animation-delay: 1s;
+}
+
+.orb-three {
+    right: 18%;
+    top: 64%;
+    animation-delay: 2s;
+}
+
+.orb-four {
+    left: 17%;
+    top: 72%;
+    animation-delay: 3s;
+}
+
+
+@keyframes floatingOrb {
+
+    0%,
+    100% {
+        transform: translateY(0);
+        opacity: .35;
+    }
+
+    50% {
+        transform: translateY(-20px);
+        opacity: 1;
+    }
+
+}
+
+
+/* =========================================================
+     TECH PANELS
+  ========================================================= */
+
+.tech-panel {
+
+    position: absolute;
+
+    z-index: 3;
+
+    display: grid;
+
+    grid-template-columns: auto 1fr;
+
+    align-items: center;
+
+    gap: 7px;
+
+    width: 120px;
+
+    padding: 10px;
+
+    color: rgba(104, 161, 255, .75);
+
+    background:
+        linear-gradient(135deg,
+            rgba(12, 50, 130, .15),
+            rgba(0, 12, 35, .05));
+
+    border:
+        1px solid rgba(39, 112, 255, .16);
+
+    box-shadow:
+        0 0 30px rgba(0, 64, 255, .06);
+
+    backdrop-filter: blur(4px);
+
+    font-size: 7px;
+
+    letter-spacing: .12em;
+
+}
+
+
+.tech-panel svg {
+    color: #347dff;
+}
+
+
+.panel-one {
+    left: 3%;
+    top: 27%;
+    transform: perspective(600px) rotateY(18deg);
+}
+
+.panel-two {
+    right: 0;
+    top: 12%;
+    transform: perspective(600px) rotateY(-18deg);
+}
+
+.panel-three {
+    right: 2%;
+    top: 45%;
+    transform: perspective(600px) rotateY(-15deg);
+}
+
+.panel-four {
+    left: 2%;
+    top: 55%;
+    transform: perspective(600px) rotateY(15deg);
+}
+
+
+.panel-line {
+
+    grid-column: 1 / -1;
+
+    width: 100%;
+    height: 2px;
+
+    margin-top: 3px;
+
+    background:
+        linear-gradient(90deg,
+            #1765ff,
+            transparent);
+
+}
+
+
+.panel-line.short {
+    width: 65%;
+}
+
+
+.panel-chart {
+
+    grid-column: 1 / -1;
+
+    display: flex;
+
+    align-items: flex-end;
+
+    height: 25px;
+
+    gap: 3px;
+
+}
+
+
+.panel-chart i {
+
+    display: block;
+
+    width: 7px;
+
+    background: #216cff;
+
+    opacity: .5;
+
+}
+
+
+.panel-chart i:nth-child(1) {
+    height: 30%;
+}
+
+.panel-chart i:nth-child(2) {
+    height: 50%;
+}
+
+.panel-chart i:nth-child(3) {
+    height: 75%;
+}
+
+.panel-chart i:nth-child(4) {
+    height: 45%;
+}
+
+.panel-chart i:nth-child(5) {
+    height: 90%;
+}
+
+
+.mini-bars {
+
+    grid-column: 1 / -1;
+
+    display: flex;
+
+    align-items: flex-end;
+
+    height: 20px;
+
+    gap: 3px;
+
+}
+
+
+.mini-bars i {
+
+    width: 8px;
+
+    background: #286fff;
+
+}
+
+
+.mini-bars i:nth-child(1) {
+    height: 30%;
+}
+
+.mini-bars i:nth-child(2) {
+    height: 50%;
+}
+
+.mini-bars i:nth-child(3) {
+    height: 80%;
+}
+
+.mini-bars i:nth-child(4) {
+    height: 60%;
+}
+
+
+.phone-lines {
+
+    grid-column: 1 / -1;
+
+    display: grid;
+
+    gap: 3px;
+
+}
+
+
+.phone-lines i {
+
+    height: 2px;
+
+    width: 100%;
+
+    background: rgba(50, 122, 255, .4);
+
+}
+
+
+/* =========================================================
+     RESPONSIVE
+  ========================================================= */
+
+@media (max-width: 1024px) {
+
+    .orbit-system {
+        transform:
+            translate(-50%, -45%) scale(.88);
+    }
+
+}
+
+
+@media (max-width: 768px) {
+
+    .orbit-system {
+
+        transform:
+            translate(-50%, -45%) scale(.72);
+
+    }
+
+    .tech-panel {
+        opacity: .45;
+    }
+
+}
+
+
+@media (max-width: 640px) {
+
+    .orbit-system {
+
+        transform:
+            translate(-50%, -42%) scale(.55);
+
+    }
+
+    .ab-logo-3d {
+        transform:
+            translate(-50%, -50%) rotateX(8deg) rotateY(-8deg) skewX(-8deg);
+    }
+
+    .tech-panel {
+        display: none;
+    }
+
+}
