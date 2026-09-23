@@ -149,8 +149,8 @@ function FeatureCard({ feature, kind, editable, busy, onToggle, currency }) {
                     disabled={busy}
                     onClick={() => onToggle(feature)}
                     className={`mt-4 inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-black transition disabled:cursor-not-allowed disabled:opacity-50 ${kind === "optional"
-                            ? "bg-blue-600 text-white hover:bg-blue-700"
-                            : "bg-slate-950 text-white hover:bg-slate-800"
+                        ? "bg-blue-600 text-white hover:bg-blue-700"
+                        : "bg-slate-950 text-white hover:bg-slate-800"
                         }`}
                 >
                     {busy ? <Loader2 size={16} className="animate-spin" /> : kind === "optional" ? <Plus size={16} /> : <Minus size={16} />}
@@ -237,15 +237,32 @@ export default function ClientProposal() {
         fetchProposal();
     }, [fetchProposal]);
 
+    // Current Investment should follow the live quotation while the client
+    // is editing a procurement proposal. After Save Quotation, the backend
+    // remains the source of truth and proposal.total_price is synchronized.
     const currentInvestment = useMemo(() => {
+        if (proposal?.quotation) {
+            if (quotePreview?.formatted_total) return quotePreview.formatted_total;
+            if (quotePreview?.total !== null && quotePreview?.total !== undefined) {
+                return money(quotePreview.total, currency);
+            }
+
+            if (proposal.quotation?.formatted_total) {
+                return proposal.quotation.formatted_total;
+            }
+            if (
+                proposal.quotation?.total !== null &&
+                proposal.quotation?.total !== undefined
+            ) {
+                return money(proposal.quotation.total, currency);
+            }
+        }
+
         if (proposal?.formatted_total) return proposal.formatted_total;
         if (proposal?.total_price !== null && proposal?.total_price !== undefined) {
             return money(proposal.total_price, currency);
         }
-        if (quotePreview?.formatted_total) return quotePreview.formatted_total;
-        if (quotePreview?.total !== null && quotePreview?.total !== undefined) {
-            return money(quotePreview.total, currency);
-        }
+
         return "—";
     }, [proposal, quotePreview, currency]);
 
@@ -532,7 +549,9 @@ export default function ClientProposal() {
                                 <div className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">Current investment</div>
                                 <div className="mt-2 break-words text-3xl font-black tracking-tight sm:text-4xl">{currentInvestment}</div>
                                 <div className="mt-4 border-t border-white/10 pt-4 text-sm leading-6 text-slate-400">
-                                    This reflects the current saved scope and commercial selection.
+                                    {quoteDirty && proposal.quotation
+                                        ? "Live preview — save the quotation to make this investment permanent."
+                                        : "This reflects the current saved scope and commercial selection."}
                                 </div>
                                 {canEdit && (
                                     <button onClick={() => setAcceptOpen(true)} className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-white px-4 py-3.5 font-black text-slate-950 transition hover:bg-blue-50">
@@ -712,7 +731,7 @@ export default function ClientProposal() {
                         {hasValue(proposal.milestones) && <Section icon={CalendarDays} eyebrow="Execution" title="Milestones"><SmartValue value={proposal.milestones} /></Section>}
                         {hasValue(proposal.integrations) && <Section icon={Cpu} eyebrow="Connected systems" title="Integrations"><SmartValue value={proposal.integrations} /></Section>}
                         {hasValue(proposal.technical_scope) && <Section icon={Cpu} eyebrow="Implementation" title="Technical Scope"><SmartValue value={proposal.technical_scope} /></Section>}
-                        {hasValue(proposal.scope) && <Section icon={Layers3} eyebrow="Engagement" title="Scope of Work"><SmartValue value={proposal.scope} /></Section>}
+                        {hasValue(proposal.scope) && !proposal.quotation && <Section icon={Layers3} eyebrow="Engagement" title="Scope of Work"><SmartValue value={proposal.scope} /></Section>}
                         {hasValue(proposal.security) && <Section icon={ShieldCheck} eyebrow="Protection" title="Security"><SmartValue value={proposal.security} /></Section>}
                         {hasValue(proposal.recurring_costs) && <Section icon={CircleDollarSign} eyebrow="Ongoing costs" title="Recurring Costs"><SmartValue value={proposal.recurring_costs} /></Section>}
 
@@ -766,7 +785,9 @@ export default function ClientProposal() {
                 </div>
             </div>
 
-            <Modal open={acceptOpen} onClose={() => setAcceptOpen(false)} title="Accept this proposal?" description="You are confirming the current scope, saved quotation selections and commercial terms.">
+            <Modal open={acceptOpen} onClose={() => setAcceptOpen(false)} title="Accept this proposal?" description={quoteDirty && proposal.quotation
+                ? "You have quotation changes that are not saved yet. Save them before acceptance so the proposal total and quotation remain synchronized."
+                : "You are confirming the current scope, saved quotation selections and commercial terms."}>
                 <div className="rounded-2xl bg-slate-50 p-4">
                     <div className="text-[10px] font-black uppercase tracking-wider text-slate-400">Current investment</div>
                     <div className="mt-1 text-2xl font-black text-slate-950">{currentInvestment}</div>
