@@ -143,7 +143,7 @@ function FeatureCard({ feature, kind, editable, busy, onToggle, currency }) {
                 )}
             </div>
 
-            {editable && kind !== "required" && (
+            {editable && (
                 <button
                     type="button"
                     disabled={busy}
@@ -154,7 +154,7 @@ function FeatureCard({ feature, kind, editable, busy, onToggle, currency }) {
                         }`}
                 >
                     {busy ? <Loader2 size={16} className="animate-spin" /> : kind === "optional" ? <Plus size={16} /> : <Minus size={16} />}
-                    {kind === "optional" ? "Add to Proposal" : "Move to Optional"}
+                    {kind === "optional" ? "Add to Proposal" : kind === "required" ? "Remove from Required" : "Move to Optional"}
                 </button>
             )}
         </div>
@@ -692,7 +692,7 @@ export default function ClientProposal() {
                         )}
 
                         {(required.length > 0 || recommended.length > 0 || optional.length > 0) && (
-                            <Section icon={Layers3} eyebrow="Project scope" title="Features & Scope" description="Required items are fixed. Recommended and optional items can be adjusted before acceptance where editing is enabled.">
+                            <Section icon={Layers3} eyebrow="Project scope" title="Features & Scope" description="Required, recommended and optional items can be adjusted before acceptance where editing is enabled.">
                                 {required.length > 0 && <div className="mb-7"><h3 className="mb-3 text-sm font-black uppercase tracking-wider text-slate-500">Required</h3><div className="grid gap-3">{required.map((f) => <FeatureCard key={f.id} feature={f} kind="required" editable={canEdit} busy={action === `feature-${f.id}`} onToggle={toggleFeature} currency={currency} />)}</div></div>}
                                 {recommended.length > 0 && <div className="mb-7"><h3 className="mb-3 text-sm font-black uppercase tracking-wider text-slate-500">Recommended & Included</h3><div className="grid gap-3">{recommended.map((f) => <FeatureCard key={f.id} feature={f} kind="recommended" editable={canEdit} busy={action === `feature-${f.id}`} onToggle={toggleFeature} currency={currency} />)}</div></div>}
                                 {optional.length > 0 && <div><h3 className="mb-3 text-sm font-black uppercase tracking-wider text-slate-500">Optional / Future</h3><div className="grid gap-3">{optional.map((f) => <FeatureCard key={f.id} feature={f} kind="optional" editable={canEdit} busy={action === `feature-${f.id}`} onToggle={toggleFeature} currency={currency} />)}</div></div>}
