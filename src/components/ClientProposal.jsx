@@ -1,344 +1,801 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
-    AlertCircle, ArrowRight, BadgeCheck, Boxes, BriefcaseBusiness, Building2,
-    CalendarDays, Check, CheckCircle2, ChevronDown, ChevronRight, CircleDollarSign,
-    Clock3, Code2, Database, FileCheck2, FileText, Globe2, Layers3, Loader2,
-    LockKeyhole, Mail, MapPin, Minus, MonitorSmartphone, Network, PackageCheck,
-    Phone, Plus, RefreshCw, Rocket, Save, ServerCog, ShieldCheck, Sparkles,
-    Target, UserRound, X, XCircle, Zap
+    ArrowRight, BriefcaseBusiness, CalendarDays, Check, CheckCircle2,
+    ChevronDown, ChevronUp, CircleDollarSign, Clock3, Cpu, FileCheck2,
+    FileText, Globe2, Layers3, Loader2, Mail, Minus, PackageCheck, Plus,
+    RefreshCw, Save, ShieldCheck, Sparkles, Trash2, UserRound, X, XCircle
 } from "lucide-react";
 
 const API_URL = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
 
-const cx = (...classes) => classes.filter(Boolean).join(" ");
-const isObject = (value) => value && typeof value === "object" && !Array.isArray(value);
+const endpoint = (path) => `${API_URL}${path}`;
+
+const money = (value, currency = "NGN") => {
+    if (value === null || value === undefined || value === "") return "—";
+    const n = Number(value);
+    if (!Number.isFinite(n)) return String(value);
+    try {
+        return new Intl.NumberFormat("en-NG", {
+            style: "currency",
+            currency: currency || "NGN",
+            maximumFractionDigits: 2,
+        }).format(n);
+    } catch {
+        return `${currency || "NGN"} ${n.toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        })}`;
+    }
+};
+
+const dateText = (value) => {
+    if (!value) return "—";
+    const d = new Date(value);
+    if (Number.isNaN(d.getTime())) return String(value);
+    return d.toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" });
+};
+
+const titleize = (value = "") =>
+    String(value).replace(/[_-]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+
 const hasValue = (value) => {
     if (value === null || value === undefined || value === "") return false;
     if (Array.isArray(value)) return value.length > 0;
-    if (isObject(value)) return Object.keys(value).length > 0;
+    if (typeof value === "object") return Object.keys(value).length > 0;
     return true;
 };
-const humanize = (value = "") => String(value)
-    .replace(/[_-]+/g, " ")
-    .replace(/\b\w/g, (char) => char.toUpperCase());
 
-const money = (value, currency = "NGN") => {
-    const amount = Number(value || 0);
-    try {
-        return new Intl.NumberFormat("en-NG", {
-            style: "currency", currency: currency || "NGN", maximumFractionDigits: 2,
-        }).format(Number.isFinite(amount) ? amount : 0);
-    } catch {
-        return `${currency || "NGN"} ${(Number.isFinite(amount) ? amount : 0).toLocaleString()}`;
-    }
-};
-
-const dateLabel = (value) => {
-    if (!value) return "—";
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return String(value);
-    return new Intl.DateTimeFormat("en", { day: "numeric", month: "short", year: "numeric" }).format(date);
-};
-
-async function apiFetch(path, options = {}) {
-    const response = await fetch(`${API_URL}${path}`, {
-        ...options,
-        headers: { Accept: "application/json", ...(options.body ? { "Content-Type": "application/json" } : {}), ...(options.headers || {}) },
-    });
-    let data = null;
-    try { data = await response.json(); } catch { data = null; }
-    if (!response.ok) {
-        const error = new Error(data?.error || data?.detail || "Unable to complete this request.");
-        error.status = response.status;
-        error.data = data;
-        throw error;
-    }
-    return data;
-}
-
-function StatusBadge({ status }) {
-    const styles = {
-        accepted: "border-emerald-400/25 bg-emerald-400/10 text-emerald-300",
-        viewed: "border-blue-400/25 bg-blue-400/10 text-blue-300",
-        sent: "border-cyan-400/25 bg-cyan-400/10 text-cyan-300",
-        ready: "border-violet-400/25 bg-violet-400/10 text-violet-300",
-        rejected: "border-rose-400/25 bg-rose-400/10 text-rose-300",
-        expired: "border-amber-400/25 bg-amber-400/10 text-amber-300",
-    };
-    return <span className={cx("inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold", styles[status] || "border-white/10 bg-white/5 text-slate-300")}>
-        <span className="h-1.5 w-1.5 rounded-full bg-current" />{humanize(status || "proposal")}
-    </span>;
-}
-
-function SectionHeading({ eyebrow, title, description, icon: Icon }) {
-    return <div className="mb-7 flex items-start gap-4">
-        {Icon && <div className="mt-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-lg shadow-blue-600/20"><Icon size={19} /></div>}
-        <div>
-            {eyebrow && <p className="text-[11px] font-black uppercase tracking-[0.22em] text-blue-600">{eyebrow}</p>}
-            <h2 className="mt-1 text-2xl font-black tracking-tight text-slate-950 sm:text-3xl dark:text-white">{title}</h2>
-            {description && <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-500 dark:text-slate-400">{description}</p>}
-        </div>
-    </div>;
-}
-
-function Card({ children, className = "" }) {
-    return <div className={cx("rounded-[26px] border border-slate-200/80 bg-white shadow-[0_18px_55px_-36px_rgba(15,23,42,.35)] dark:border-white/[0.08] dark:bg-[#0c1422]", className)}>{children}</div>;
-}
-
-function EmptyState({ children = "No information has been added to this section." }) {
-    return <div className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm text-slate-500 dark:border-white/10 dark:text-slate-400">{children}</div>;
-}
-
-function PrimitiveValue({ value }) {
-    if (typeof value === "boolean") return <span className={cx("inline-flex rounded-full px-2.5 py-1 text-xs font-bold", value ? "bg-emerald-500/10 text-emerald-600" : "bg-slate-500/10 text-slate-500")}>{value ? "Included" : "Not included"}</span>;
-    return <span>{String(value)}</span>;
-}
+const apiError = (data, fallback) =>
+    data?.error || data?.detail || data?.message || fallback;
 
 function SmartValue({ value, depth = 0 }) {
-    if (!hasValue(value)) return <span className="text-slate-400">Not specified</span>;
-    if (["string", "number", "boolean"].includes(typeof value)) return <PrimitiveValue value={value} />;
-    if (Array.isArray(value)) {
-        return <div className="space-y-2">{value.map((item, index) => (
-            <div key={item?.id || item?.name || item?.title || index} className="flex gap-3 text-sm leading-6 text-slate-600 dark:text-slate-300">
-                <CheckCircle2 className="mt-1 h-4 w-4 shrink-0 text-blue-500" />
-                <div className="min-w-0 flex-1">{isObject(item) || Array.isArray(item) ? <SmartValue value={item} depth={depth + 1} /> : <PrimitiveValue value={item} />}</div>
-            </div>
-        ))}</div>;
-    }
-    return <div className={cx("grid gap-3", depth === 0 && "sm:grid-cols-2")}>{Object.entries(value).filter(([, v]) => hasValue(v)).map(([key, item]) => (
-        <div key={key} className="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-4 dark:border-white/[0.07] dark:bg-white/[0.025]">
-            <p className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">{humanize(key)}</p>
-            <div className="mt-2 text-sm font-medium leading-6 text-slate-700 dark:text-slate-200"><SmartValue value={item} depth={depth + 1} /></div>
-        </div>
-    ))}</div>;
-}
-
-function InfoSection({ title, eyebrow, description, icon, value }) {
     if (!hasValue(value)) return null;
-    return <section className="scroll-mt-24"><SectionHeading eyebrow={eyebrow} title={title} description={description} icon={icon} /><Card className="p-5 sm:p-7"><SmartValue value={value} /></Card></section>;
-}
 
-function FeatureCard({ feature, tone, editable, busy, onToggle }) {
-    const included = feature.scope_status !== "optional";
-    const styles = {
-        required: { icon: "bg-emerald-500/10 text-emerald-600", badge: "bg-emerald-500/10 text-emerald-600", label: "Required" },
-        recommended: { icon: "bg-blue-500/10 text-blue-600", badge: "bg-blue-500/10 text-blue-600", label: "Recommended" },
-        optional: { icon: "bg-violet-500/10 text-violet-600", badge: "bg-violet-500/10 text-violet-600", label: "Optional" },
-    }[tone];
-    return <Card className="group relative overflow-hidden p-5 sm:p-6">
-        <div className="flex items-start justify-between gap-4">
-            <div className={cx("flex h-11 w-11 items-center justify-center rounded-2xl", styles.icon)}>{included ? <Check size={18} /> : <Plus size={18} />}</div>
-            <span className={cx("rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-wider", styles.badge)}>{styles.label}</span>
-        </div>
-        <h3 className="mt-5 text-base font-black text-slate-950 dark:text-white">{feature.name}</h3>
-        {feature.description && <p className="mt-2 text-sm leading-6 text-slate-500 dark:text-slate-400">{feature.description}</p>}
-        <div className="mt-5 flex flex-wrap gap-2 text-xs text-slate-500">
-            {feature.category && <span className="rounded-full bg-slate-100 px-2.5 py-1 dark:bg-white/5">{feature.category}</span>}
-            {feature.complexity && <span className="rounded-full bg-slate-100 px-2.5 py-1 dark:bg-white/5">{humanize(feature.complexity)} complexity</span>}
-            {Number(feature.total_price) > 0 && <span className="rounded-full bg-slate-100 px-2.5 py-1 font-bold dark:bg-white/5">{money(feature.total_price)}</span>}
-        </div>
-        {tone !== "required" && editable && <button disabled={busy} onClick={() => onToggle(feature)} className={cx("mt-5 inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-black transition disabled:opacity-50", included ? "bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-white/5 dark:text-slate-200" : "bg-blue-600 text-white hover:bg-blue-700")}>
-            {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : included ? <Minus size={14} /> : <Plus size={14} />}{included ? "Move to optional" : "Add to proposal"}
-        </button>}
-    </Card>;
-}
+    if (["string", "number", "boolean"].includes(typeof value)) {
+        return (
+            <div className="text-sm leading-7 text-slate-600">
+                {typeof value === "boolean" ? (value ? "Yes" : "No") : String(value)}
+            </div>
+        );
+    }
 
-function FeatureSection({ proposal, onToggle, busyId }) {
-    const groups = [
-        ["Required & included", "Core scope included in this proposal.", "required", proposal.required_features || []],
-        ["Recommended enhancements", "Recommended additions that strengthen the solution.", "recommended", proposal.recommended_features || []],
-        ["Optional add-ons", "Useful additions you can include before acceptance.", "optional", proposal.optional_features || []],
-    ];
-    if (!groups.some(([, , , items]) => items.length)) return null;
-    return <section id="scope" className="scroll-mt-24"><SectionHeading eyebrow="Solution scope" title="What is included in your proposal" description="Review the agreed core scope and adjust recommended or optional items before accepting." icon={Layers3} />
-        <div className="space-y-8">{groups.map(([title, desc, tone, items]) => items.length > 0 && <div key={tone}>
-            <div className="mb-4"><h3 className="font-black text-slate-900 dark:text-white">{title}</h3><p className="mt-1 text-sm text-slate-500">{desc}</p></div>
-            <div className="grid gap-4 md:grid-cols-2">{items.map((feature) => <FeatureCard key={feature.id} feature={feature} tone={tone} editable={proposal.client_editable && !["accepted", "rejected", "expired", "cancelled"].includes(proposal.status)} busy={busyId === feature.id} onToggle={onToggle} />)}</div>
-        </div>)}</div>
-    </section>;
-}
+    if (Array.isArray(value)) {
+        return (
+            <div className="grid gap-2.5">
+                {value.map((item, i) => (
+                    <div key={i} className="flex gap-3 rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3">
+                        <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-600" />
+                        <div className="min-w-0 flex-1">
+                            <SmartValue value={item} depth={depth + 1} />
+                        </div>
+                    </div>
+                ))}
+            </div>
+        );
+    }
 
-function QuotationEditor({ proposal, quotation, onSaved }) {
-    const editable = proposal.client_editable && !["accepted", "rejected", "expired", "cancelled"].includes(proposal.status);
-    const [items, setItems] = useState([]);
-    const [preview, setPreview] = useState(null);
-    const [busy, setBusy] = useState("");
-    const [error, setError] = useState("");
-    const token = proposal.public_token;
-
-    useEffect(() => {
-        setItems((quotation?.items || []).map((item) => ({ ...item, quantity: Number(item.quantity || 0), included: item.included !== false && Number(item.quantity || 0) > 0 })));
-        setPreview(null);
-    }, [quotation]);
-
-    const payload = useMemo(() => ({ items: items.map((item) => ({ id: item.id, quantity: item.included ? Math.max(1, Number(item.quantity || 1)) : 0, included: Boolean(item.included) })) }), [items]);
-    const updateItem = (id, patch) => setItems((current) => current.map((item) => item.id === id ? { ...item, ...patch } : item));
-
-    const previewChanges = async () => {
-        setBusy("preview"); setError("");
-        try {
-            const data = await apiFetch(`/api/proposals/client/${token}/quotation/preview/`, { method: "POST", body: JSON.stringify(payload) });
-            setPreview(data.quotation || data);
-        } catch (err) { setError(err.message); }
-        finally { setBusy(""); }
-    };
-    const saveChanges = async () => {
-        setBusy("save"); setError("");
-        try {
-            const data = await apiFetch(`/api/proposals/client/${token}/quotation/update/`, { method: "POST", body: JSON.stringify(payload) });
-            setPreview(data.quotation || data);
-            await onSaved();
-        } catch (err) { setError(err.message); }
-        finally { setBusy(""); }
-    };
-
-    if (!quotation) return null;
-    const shown = preview || quotation;
-    return <section id="quotation" className="scroll-mt-24"><SectionHeading eyebrow="Commercial quotation" title={quotation.title || "Investment & procurement"} description={quotation.description || quotation.purpose || "Review quantities, specifications and the commercial total."} icon={PackageCheck} />
-        <div className="space-y-4">{items.map((item) => <Card key={item.id} className={cx("overflow-hidden transition", !item.included && "opacity-60")}>
-            <div className="grid gap-5 p-5 sm:p-6 lg:grid-cols-[1fr_auto]">
-                <div>
-                    <div className="flex flex-wrap items-center gap-2"><span className="rounded-full bg-blue-500/10 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-blue-600">{item.category || "Item"}</span>{item.brand && <span className="text-xs font-bold text-slate-400">{item.brand}{item.model ? ` • ${item.model}` : ""}</span>}</div>
-                    <h3 className="mt-3 text-lg font-black text-slate-950 dark:text-white">{item.name}</h3>
-                    {item.description && <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-500 dark:text-slate-400">{item.description}</p>}
-                    {hasValue(item.specifications) && <div className="mt-4"><SmartValue value={item.specifications} /></div>}
+    return (
+        <div className={depth ? "grid gap-2" : "grid gap-3 sm:grid-cols-2"}>
+            {Object.entries(value).filter(([, v]) => hasValue(v)).map(([key, v]) => (
+                <div key={key} className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
+                    <div className="mb-1.5 text-[11px] font-black uppercase tracking-[0.14em] text-slate-400">
+                        {titleize(key)}
+                    </div>
+                    <SmartValue value={v} depth={depth + 1} />
                 </div>
-                <div className="min-w-[210px] rounded-2xl bg-slate-50 p-4 dark:bg-white/[0.035]">
-                    <p className="text-[10px] font-black uppercase tracking-wider text-slate-400">Unit price</p><p className="mt-1 font-black text-slate-900 dark:text-white">{money(item.unit_price, quotation.currency || proposal.currency)}</p>
-                    <div className="mt-4 flex items-center justify-between gap-3"><span className="text-xs font-bold text-slate-500">Quantity</span><div className="flex items-center rounded-xl border border-slate-200 bg-white dark:border-white/10 dark:bg-slate-900">
-                        <button disabled={!editable || !item.included} onClick={() => updateItem(item.id, { quantity: Math.max(1, item.quantity - 1) })} className="p-2 disabled:opacity-30"><Minus size={14} /></button>
-                        <input disabled={!editable || !item.included} value={item.quantity} onChange={(e) => updateItem(item.id, { quantity: Math.max(1, Number(e.target.value || 1)) })} className="w-12 bg-transparent text-center text-sm font-black outline-none" type="number" min="1" />
-                        <button disabled={!editable || !item.included} onClick={() => updateItem(item.id, { quantity: item.quantity + 1 })} className="p-2 disabled:opacity-30"><Plus size={14} /></button>
-                    </div></div>
-                    {editable && <button onClick={() => updateItem(item.id, { included: !item.included })} className={cx("mt-3 w-full rounded-xl px-3 py-2 text-xs font-black", item.included ? "bg-rose-500/10 text-rose-600" : "bg-emerald-500/10 text-emerald-600")}>{item.included ? "Remove item" : "Restore item"}</button>}
+            ))}
+        </div>
+    );
+}
+
+function Section({ id, icon: Icon = FileText, eyebrow, title, description, children, className = "" }) {
+    return (
+        <section id={id} className={`overflow-hidden rounded-[28px] border border-slate-200/80 bg-white shadow-[0_18px_70px_rgba(15,23,42,0.06)] ${className}`}>
+            <div className="border-b border-slate-100 px-5 py-5 sm:px-7 sm:py-6">
+                <div className="flex gap-4">
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-slate-950 text-white">
+                        <Icon size={19} />
+                    </div>
+                    <div>
+                        {eyebrow && <div className="mb-1 text-[10px] font-black uppercase tracking-[0.22em] text-blue-600">{eyebrow}</div>}
+                        <h2 className="text-xl font-black tracking-tight text-slate-950 sm:text-2xl">{title}</h2>
+                        {description && <p className="mt-1.5 max-w-3xl text-sm leading-6 text-slate-500">{description}</p>}
+                    </div>
                 </div>
             </div>
-        </Card>)}</div>
-        <Card className="mt-5 overflow-hidden"><div className="grid gap-6 p-6 lg:grid-cols-[1fr_360px] lg:p-8"><div>
-            <h3 className="text-lg font-black text-slate-950 dark:text-white">Quotation summary</h3><p className="mt-2 text-sm leading-6 text-slate-500">All prices are calculated by the server. Changing a quantity never changes the authoritative unit price, product brand, model or specification.</p>
-            {error && <div className="mt-4 flex gap-2 rounded-xl bg-rose-500/10 p-3 text-sm text-rose-600"><AlertCircle size={17} className="mt-0.5 shrink-0" />{error}</div>}
-            {editable && <div className="mt-5 flex flex-wrap gap-3"><button disabled={!!busy} onClick={previewChanges} className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-3 text-sm font-black text-slate-700 hover:bg-slate-50 disabled:opacity-50 dark:border-white/10 dark:text-white dark:hover:bg-white/5">{busy === "preview" ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw size={16} />}Preview changes</button><button disabled={!!busy} onClick={saveChanges} className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-black text-white shadow-lg shadow-blue-600/20 hover:bg-blue-700 disabled:opacity-50">{busy === "save" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save size={16} />}Save quotation</button></div>}
-        </div><div className="rounded-2xl bg-slate-950 p-5 text-white"><PriceRow label="Subtotal" value={shown.formatted_subtotal || money(shown.subtotal, shown.currency || proposal.currency)} /><PriceRow label="Discount" value={shown.formatted_discount || money(shown.discount, shown.currency || proposal.currency)} /><PriceRow label="Tax" value={shown.formatted_tax || money(shown.tax, shown.currency || proposal.currency)} /><PriceRow label="Delivery" value={shown.formatted_delivery_fee || money(shown.delivery_fee, shown.currency || proposal.currency)} /><div className="my-4 h-px bg-white/10" /><div className="flex items-end justify-between gap-4"><span className="text-sm font-bold text-slate-400">Total investment</span><span className="text-xl font-black">{shown.formatted_total || money(shown.total, shown.currency || proposal.currency)}</span></div></div></div></Card>
-    </section>;
+            <div className="p-5 sm:p-7">{children}</div>
+        </section>
+    );
 }
 
-function PriceRow({ label, value }) { return <div className="mb-3 flex items-center justify-between gap-4 text-sm"><span className="text-slate-400">{label}</span><span className="font-bold">{value}</span></div>; }
-
-function ScreensSection({ screens }) {
-    if (!screens?.length) return null;
-    return <section className="scroll-mt-24"><SectionHeading eyebrow="User experience" title="Screens & experiences" description="The key interfaces and workflows planned for the solution." icon={MonitorSmartphone} /><div className="grid gap-4 md:grid-cols-2">{screens.map((screen) => <Card key={screen.id || screen.name} className="p-5 sm:p-6"><div className="flex items-start justify-between gap-4"><div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-500/10 text-violet-600"><MonitorSmartphone size={18} /></div>{screen.complexity && <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-black uppercase text-slate-500 dark:bg-white/5">{screen.complexity}</span>}</div><h3 className="mt-4 font-black text-slate-950 dark:text-white">{screen.name}</h3>{screen.purpose && <p className="mt-2 text-sm leading-6 text-slate-500">{screen.purpose}</p>}<div className="mt-4"><SmartValue value={{ key_functionality: screen.key_functionality, major_components: screen.major_components, user_roles: screen.user_roles }} /></div></Card>)}</div></section>;
-}
-
-function TimelineSection({ timeline, milestones }) {
-    const items = Array.isArray(milestones) && milestones.length ? milestones : (isObject(timeline) ? Object.entries(timeline).map(([key, value]) => ({ title: humanize(key), detail: value })) : []);
-    if (!items.length && !hasValue(timeline)) return null;
-    return <section id="timeline" className="scroll-mt-24"><SectionHeading eyebrow="Delivery plan" title="Project roadmap" description="A clear view of how the engagement moves from agreement to delivery." icon={Rocket} /><Card className="p-5 sm:p-8"><div className="space-y-0">{items.length ? items.map((item, index) => <div key={item.id || item.title || index} className="relative flex gap-5 pb-7 last:pb-0"><div className="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-600 text-xs font-black text-white">{String(index + 1).padStart(2, "0")}</div>{index < items.length - 1 && <div className="absolute left-5 top-10 h-[calc(100%-40px)] w-px bg-slate-200 dark:bg-white/10" />}<div className="pt-1"><h3 className="font-black text-slate-950 dark:text-white">{item.title || item.name || item.milestone || `Phase ${index + 1}`}</h3><div className="mt-2 text-sm leading-6 text-slate-500 dark:text-slate-400"><SmartValue value={item.detail ?? item.description ?? item} /></div></div></div>) : <SmartValue value={timeline} />}</div></Card></section>;
-}
-
-function Modal({ open, onClose, title, children }) {
-    if (!open) return null;
-    return <div className="fixed inset-0 z-[100] flex items-center justify-center p-4"><button aria-label="Close" className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm" onClick={onClose} /><div className="relative w-full max-w-lg rounded-[28px] border border-white/10 bg-white p-6 shadow-2xl dark:bg-[#0b1220] sm:p-8"><div className="flex items-start justify-between gap-4"><h2 className="text-xl font-black text-slate-950 dark:text-white">{title}</h2><button onClick={onClose} className="rounded-xl bg-slate-100 p-2 dark:bg-white/5"><X size={18} /></button></div>{children}</div></div>;
-}
-
-function ActionModal({ type, proposal, open, onClose, onComplete }) {
-    const [comment, setComment] = useState(""); const [busy, setBusy] = useState(false); const [error, setError] = useState("");
-    useEffect(() => { if (open) { setComment(""); setError(""); } }, [open]);
-    const accept = type === "accept";
-    const submit = async () => {
-        if (!accept && comment.trim().length < 5) { setError("Please provide a brief reason for declining the proposal."); return; }
-        setBusy(true); setError("");
-        try {
-            const data = await apiFetch(`/api/proposals/client/${proposal.public_token}/${accept ? "accept" : "decline"}/`, { method: "POST", body: JSON.stringify({ comment: comment.trim() }) });
-            await onComplete(data); onClose();
-        } catch (err) { setError(err.message); } finally { setBusy(false); }
+function Badge({ children, tone = "slate" }) {
+    const tones = {
+        green: "border-emerald-200 bg-emerald-50 text-emerald-700",
+        blue: "border-blue-200 bg-blue-50 text-blue-700",
+        amber: "border-amber-200 bg-amber-50 text-amber-700",
+        red: "border-red-200 bg-red-50 text-red-700",
+        slate: "border-slate-200 bg-slate-50 text-slate-600",
     };
-    return <Modal open={open} onClose={busy ? undefined : onClose} title={accept ? "Accept this proposal" : "Decline proposal"}><div className="mt-5">
-        <div className={cx("rounded-2xl p-4 text-sm leading-6", accept ? "bg-emerald-500/10 text-emerald-800 dark:text-emerald-300" : "bg-rose-500/10 text-rose-700 dark:text-rose-300")}>{accept ? <>You are accepting <strong>version {proposal.version}</strong> with a current investment of <strong>{proposal.formatted_total || money(proposal.total_price, proposal.currency)}</strong>. Your accepted scope and quotation will be frozen by the server.</> : <>Declining will close this proposal for further client editing. Please tell us briefly why so the team can respond appropriately.</>}</div>
-        <label className="mt-5 block text-xs font-black uppercase tracking-wider text-slate-500">{accept ? "Comment (optional)" : "Reason for declining"}</label><textarea value={comment} onChange={(e) => setComment(e.target.value)} rows={4} maxLength={5000} placeholder={accept ? "Anything you would like us to note before we proceed?" : "Please share the reason for declining..."} className="mt-2 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm outline-none focus:border-blue-500 dark:border-white/10 dark:bg-white/[0.035] dark:text-white" />
-        {error && <p className="mt-3 flex gap-2 text-sm text-rose-600"><AlertCircle size={16} className="mt-0.5" />{error}</p>}
-        <div className="mt-6 flex gap-3"><button disabled={busy} onClick={onClose} className="flex-1 rounded-xl border border-slate-200 px-4 py-3 text-sm font-black dark:border-white/10 dark:text-white">Cancel</button><button disabled={busy} onClick={submit} className={cx("flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-black text-white disabled:opacity-50", accept ? "bg-emerald-600 hover:bg-emerald-700" : "bg-rose-600 hover:bg-rose-700")}>{busy && <Loader2 className="h-4 w-4 animate-spin" />}{accept ? "Confirm acceptance" : "Decline proposal"}</button></div>
-    </div></Modal>;
+    return <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-[10px] font-black uppercase tracking-wider ${tones[tone]}`}>{children}</span>;
 }
 
-function ProposalSidebar({ proposal, onAccept, onDecline }) {
-    const locked = ["accepted", "rejected", "expired", "cancelled"].includes(proposal.status);
-    return <aside className="lg:sticky lg:top-24 lg:self-start"><Card className="overflow-hidden"><div className="bg-slate-950 p-6 text-white"><p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-300">Current investment</p><p className="mt-3 text-3xl font-black tracking-tight">{proposal.formatted_total || money(proposal.total_price, proposal.currency)}</p><div className="mt-4 flex items-center gap-2 text-xs text-slate-400"><FileCheck2 size={14} />Proposal v{proposal.version}</div></div><div className="p-5">
-        <div className="space-y-3 text-sm"><SideMeta icon={UserRound} label="Prepared for" value={proposal.client?.name || proposal.client?.company || "Client"} /><SideMeta icon={CalendarDays} label="Prepared" value={dateLabel(proposal.created_at)} /><SideMeta icon={Clock3} label="Valid until" value={dateLabel(proposal.expires_at)} /><SideMeta icon={Globe2} label="Currency" value={proposal.currency || "NGN"} /></div>
-        {!locked && proposal.client_editable && <div className="mt-6 space-y-3"><button onClick={onAccept} className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3.5 text-sm font-black text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700">Review & accept <ArrowRight size={16} /></button><button onClick={onDecline} className="w-full rounded-xl px-4 py-3 text-sm font-bold text-slate-500 transition hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-500/10">Decline proposal</button></div>}
-        {proposal.status === "accepted" && <div className="mt-6 rounded-2xl bg-emerald-500/10 p-4 text-emerald-700 dark:text-emerald-300"><div className="flex items-center gap-2 font-black"><BadgeCheck size={18} />Proposal accepted</div><p className="mt-2 text-xs leading-5">Accepted {dateLabel(proposal.accepted_at)}{proposal.accepted_version ? ` • Version ${proposal.accepted_version}` : ""}</p></div>}
-        {proposal.status === "rejected" && <div className="mt-6 rounded-2xl bg-rose-500/10 p-4 text-sm font-bold text-rose-600">This proposal has been declined.</div>}
-    </div></Card></aside>;
+function FeatureCard({ feature, kind, editable, busy, onToggle, currency }) {
+    const included = kind !== "optional";
+    return (
+        <div className="group rounded-3xl border border-slate-200 bg-white p-5 transition hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-xl hover:shadow-slate-200/50">
+            <div className="flex flex-col justify-between gap-4 sm:flex-row">
+                <div className="min-w-0">
+                    <div className="mb-2 flex flex-wrap items-center gap-2">
+                        <Badge tone={kind === "required" ? "green" : kind === "recommended" ? "blue" : "slate"}>
+                            {kind === "required" ? "Required · Included" : kind === "recommended" ? "Recommended · Included" : "Optional · Not Included"}
+                        </Badge>
+                        {feature.category && <Badge>{titleize(feature.category)}</Badge>}
+                    </div>
+                    <h3 className="text-base font-black text-slate-950 sm:text-lg">{feature.name}</h3>
+                    {feature.description && <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-500">{feature.description}</p>}
+                </div>
+                {feature.total_price !== null && feature.total_price !== undefined && (
+                    <div className="shrink-0 text-left sm:text-right">
+                        <div className="text-[10px] font-black uppercase tracking-wider text-slate-400">{included ? "Included value" : "Add-on value"}</div>
+                        <div className="mt-1 font-black text-slate-950">{money(feature.total_price, currency)}</div>
+                    </div>
+                )}
+            </div>
+
+            {editable && kind !== "required" && (
+                <button
+                    type="button"
+                    disabled={busy}
+                    onClick={() => onToggle(feature)}
+                    className={`mt-4 inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-black transition disabled:cursor-not-allowed disabled:opacity-50 ${kind === "optional"
+                            ? "bg-blue-600 text-white hover:bg-blue-700"
+                            : "bg-slate-950 text-white hover:bg-slate-800"
+                        }`}
+                >
+                    {busy ? <Loader2 size={16} className="animate-spin" /> : kind === "optional" ? <Plus size={16} /> : <Minus size={16} />}
+                    {kind === "optional" ? "Add to Proposal" : "Move to Optional"}
+                </button>
+            )}
+        </div>
+    );
 }
 
-function SideMeta({ icon: Icon, label, value }) { return <div className="flex items-center gap-3"><div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-500 dark:bg-white/5"><Icon size={15} /></div><div><p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{label}</p><p className="mt-0.5 font-bold text-slate-800 dark:text-slate-200">{value || "—"}</p></div></div>; }
-
-function LoadingScreen() { return <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-[#070b14]"><div className="text-center"><div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-xl shadow-blue-600/20"><Loader2 className="h-6 w-6 animate-spin" /></div><p className="mt-5 text-sm font-bold text-slate-500">Preparing your proposal…</p></div></div>; }
-function ErrorScreen({ error, retry }) { return <div className="flex min-h-screen items-center justify-center bg-slate-50 p-5 dark:bg-[#070b14]"><Card className="w-full max-w-lg p-8 text-center"><div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-500/10 text-rose-600"><AlertCircle size={24} /></div><h1 className="mt-5 text-2xl font-black dark:text-white">Proposal unavailable</h1><p className="mt-3 text-sm leading-6 text-slate-500">{error}</p><button onClick={retry} className="mt-6 inline-flex items-center gap-2 rounded-xl bg-slate-950 px-5 py-3 text-sm font-black text-white dark:bg-white dark:text-slate-950"><RefreshCw size={16} />Try again</button></Card></div>; }
+function Modal({ open, title, description, children, onClose }) {
+    if (!open) return null;
+    return (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/65 p-4 backdrop-blur-sm">
+            <div className="w-full max-w-lg overflow-hidden rounded-[28px] bg-white shadow-2xl">
+                <div className="flex items-start justify-between gap-4 border-b border-slate-100 p-6">
+                    <div>
+                        <h3 className="text-xl font-black text-slate-950">{title}</h3>
+                        {description && <p className="mt-1 text-sm leading-6 text-slate-500">{description}</p>}
+                    </div>
+                    <button onClick={onClose} className="rounded-xl p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700"><X size={20} /></button>
+                </div>
+                <div className="p-6">{children}</div>
+            </div>
+        </div>
+    );
+}
 
 export default function ClientProposal() {
     const { publicToken } = useParams();
-    const [proposal, setProposal] = useState(null); const [loading, setLoading] = useState(true); const [error, setError] = useState(""); const [featureBusy, setFeatureBusy] = useState(null); const [modal, setModal] = useState(null); const [toast, setToast] = useState("");
 
-    const loadProposal = useCallback(async (silent = false) => {
-        if (!publicToken) { setError("The proposal link is incomplete."); setLoading(false); return; }
-        if (!silent) setLoading(true); setError("");
-        try { const data = await apiFetch(`/api/proposals/client/${publicToken}/`); setProposal(data.proposal); }
-        catch (err) { setError(err.message); }
-        finally { if (!silent) setLoading(false); }
+    const [proposal, setProposal] = useState(null);
+    const [quoteDraft, setQuoteDraft] = useState([]);
+    const [quotePreview, setQuotePreview] = useState(null);
+    const [quoteDirty, setQuoteDirty] = useState(false);
+
+    const [loading, setLoading] = useState(true);
+    const [action, setAction] = useState("");
+    const [error, setError] = useState("");
+    const [notice, setNotice] = useState("");
+
+    const [acceptOpen, setAcceptOpen] = useState(false);
+    const [declineOpen, setDeclineOpen] = useState(false);
+    const [acceptComment, setAcceptComment] = useState("");
+    const [declineComment, setDeclineComment] = useState("");
+
+    const currency = proposal?.currency || proposal?.quotation?.currency || "NGN";
+
+    const fetchProposal = useCallback(async ({ quiet = false } = {}) => {
+        if (!publicToken) return;
+        if (!quiet) setLoading(true);
+        setError("");
+
+        try {
+            const response = await fetch(endpoint(`/api/proposals/client/${publicToken}/`), {
+                method: "GET",
+                headers: { Accept: "application/json" },
+                credentials: "same-origin",
+            });
+            const data = await response.json().catch(() => null);
+            if (!response.ok || !data?.success || !data?.proposal) {
+                throw new Error(apiError(data, "Unable to load this proposal."));
+            }
+
+            const p = data.proposal;
+            setProposal(p);
+
+            const items = Array.isArray(p?.quotation?.items) ? p.quotation.items : [];
+            setQuoteDraft(items.map((item) => ({
+                ...item,
+                quantity: Number(item.quantity || 0),
+                included: Number(item.quantity || 0) > 0,
+            })));
+            setQuotePreview(p.quotation || null);
+            setQuoteDirty(false);
+        } catch (e) {
+            setError(e.message || "Unable to load this proposal.");
+        } finally {
+            if (!quiet) setLoading(false);
+        }
     }, [publicToken]);
-    useEffect(() => { loadProposal(); }, [loadProposal]);
-    useEffect(() => { if (!toast) return; const timer = setTimeout(() => setToast(""), 3500); return () => clearTimeout(timer); }, [toast]);
 
-    const toggleFeature = async (feature) => {
-        setFeatureBusy(feature.id);
-        try { const data = await apiFetch(`/api/proposals/client/${publicToken}/features/${feature.id}/toggle/`, { method: "POST", body: JSON.stringify({}) }); await loadProposal(true); setToast(`${data.feature?.name || feature.name} updated.`); }
-        catch (err) { setToast(err.message); }
-        finally { setFeatureBusy(null); }
+    useEffect(() => {
+        fetchProposal();
+    }, [fetchProposal]);
+
+    const currentInvestment = useMemo(() => {
+        if (proposal?.formatted_total) return proposal.formatted_total;
+        if (proposal?.total_price !== null && proposal?.total_price !== undefined) {
+            return money(proposal.total_price, currency);
+        }
+        if (quotePreview?.formatted_total) return quotePreview.formatted_total;
+        if (quotePreview?.total !== null && quotePreview?.total !== undefined) {
+            return money(quotePreview.total, currency);
+        }
+        return "—";
+    }, [proposal, quotePreview, currency]);
+
+    const canEdit = Boolean(proposal?.client_editable) &&
+        !["accepted", "rejected", "expired", "cancelled", "completed"].includes(proposal?.status);
+
+    const updateDraft = (id, patch) => {
+        setQuoteDraft((items) => items.map((item) => item.id === id ? { ...item, ...patch } : item));
+        setQuoteDirty(true);
+        setNotice("");
     };
 
-    if (loading) return <LoadingScreen />;
-    if (error || !proposal) return <ErrorScreen error={error || "This proposal could not be loaded."} retry={() => loadProposal()} />;
+    const quotationPayload = () => ({
+        items: quoteDraft.map((item) => ({
+            id: item.id,
+            quantity: item.included ? Math.max(1, Number(item.quantity || 1)) : 0,
+            included: Boolean(item.included),
+        })),
+    });
 
-    const clientName = proposal.client?.name || proposal.client?.company || "Client";
-    return <div className="min-h-screen bg-[#f7f9fc] text-slate-900 dark:bg-[#070b14] dark:text-white">
-        <header className="relative overflow-hidden bg-[#07101f] text-white">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(37,99,235,.22),transparent_32%),radial-gradient(circle_at_85%_20%,rgba(124,58,237,.16),transparent_28%)]" />
-            <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(rgba(255,255,255,.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.08)_1px,transparent_1px)] [background-size:44px_44px]" />
-            <div className="relative mx-auto max-w-7xl px-5 py-6 sm:px-6 lg:px-8"><div className="flex items-center justify-between gap-4"><a href="/" className="flex items-center gap-3"><div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 font-black">AB</div><div><p className="text-sm font-black tracking-tight">AB Technologies</p><p className="text-[10px] uppercase tracking-[0.2em] text-slate-400">Client Proposal</p></div></a><StatusBadge status={proposal.status} /></div></div>
-            <div className="relative mx-auto max-w-7xl px-5 pb-16 pt-12 sm:px-6 sm:pb-20 lg:px-8 lg:pb-24 lg:pt-16"><div className="max-w-4xl"><div className="flex flex-wrap items-center gap-2 text-xs font-bold text-blue-300"><span>Prepared for {clientName}</span><span className="text-white/20">•</span><span>Proposal v{proposal.version}</span></div><h1 className="mt-5 text-4xl font-black tracking-[-0.04em] sm:text-5xl lg:text-6xl">{proposal.title}</h1>{proposal.client_summary && <p className="mt-6 max-w-3xl text-base leading-8 text-slate-300 sm:text-lg">{proposal.client_summary}</p>}
-                <div className="mt-8 flex flex-wrap gap-3"><a href="#scope" className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-black text-slate-950 hover:bg-blue-50">Explore proposal <ChevronDown size={16} /></a>{proposal.client?.company && <span className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-bold text-slate-300"><Building2 size={16} />{proposal.client.company}</span>}</div>
-            </div></div>
-        </header>
+    const previewQuotation = async (draft = quoteDraft) => {
+        if (!proposal?.quotation) return;
+        setAction("preview");
+        setError("");
+        try {
+            const response = await fetch(endpoint(`/api/proposals/client/${publicToken}/quotation/preview/`), {
+                method: "POST",
+                headers: { "Content-Type": "application/json", Accept: "application/json" },
+                credentials: "same-origin",
+                body: JSON.stringify({
+                    items: draft.map((item) => ({
+                        id: item.id,
+                        quantity: item.included ? Math.max(1, Number(item.quantity || 1)) : 0,
+                        included: Boolean(item.included),
+                    })),
+                }),
+            });
+            const data = await response.json().catch(() => null);
+            if (!response.ok || !data?.success) throw new Error(apiError(data, "Unable to recalculate quotation."));
+            setQuotePreview(data.quotation);
+        } catch (e) {
+            setError(e.message || "Unable to recalculate quotation.");
+        } finally {
+            setAction("");
+        }
+    };
 
-        <main className="mx-auto max-w-7xl px-5 py-12 sm:px-6 lg:px-8 lg:py-16"><div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_320px] xl:grid-cols-[minmax(0,1fr)_350px]"><div className="space-y-16">
-            {(hasValue(proposal.business_objectives) || hasValue(proposal.confirmed_requirements)) && <section><SectionHeading eyebrow="Executive overview" title="Understanding your objectives" description="The business goals and confirmed needs shaping this engagement." icon={Target} /><div className="grid gap-4 md:grid-cols-2">{hasValue(proposal.business_objectives) && <Card className="p-6"><h3 className="mb-4 flex items-center gap-2 font-black dark:text-white"><Target size={17} className="text-blue-600" />Business objectives</h3><SmartValue value={proposal.business_objectives} /></Card>}{hasValue(proposal.confirmed_requirements) && <Card className="p-6"><h3 className="mb-4 flex items-center gap-2 font-black dark:text-white"><CheckCircle2 size={17} className="text-emerald-600" />Confirmed requirements</h3><SmartValue value={proposal.confirmed_requirements} /></Card>}</div></section>}
+    const changeQuantity = (item, delta) => {
+        const next = Math.max(1, Number(item.quantity || 1) + delta);
+        const nextDraft = quoteDraft.map((x) => x.id === item.id ? { ...x, quantity: next, included: true } : x);
+        setQuoteDraft(nextDraft);
+        setQuoteDirty(true);
+        setNotice("");
+        previewQuotation(nextDraft);
+    };
 
-            <FeatureSection proposal={proposal} onToggle={toggleFeature} busyId={featureBusy} />
-            <QuotationEditor proposal={proposal} quotation={proposal.quotation} onSaved={() => loadProposal(true)} />
-            <InfoSection eyebrow="Complete scope" title="Solution scope" description="The agreed functional and operational boundaries of the engagement." icon={BriefcaseBusiness} value={proposal.scope} />
-            <InfoSection eyebrow="Requirements" title="Project requirements" icon={FileCheck2} value={proposal.requirements} />
-            <ScreensSection screens={proposal.screens} />
-            <InfoSection eyebrow="Experience" title="Pages & application areas" icon={Layers3} value={proposal.pages} />
-            <InfoSection eyebrow="Capabilities" title="Features & functionality" icon={Zap} value={proposal.features} />
-            <div className="grid gap-8 xl:grid-cols-2"><InfoSection eyebrow="Access" title="Authentication & identity" icon={LockKeyhole} value={proposal.authentication} /><InfoSection eyebrow="Connectivity" title="Integrations" icon={Network} value={proposal.integrations} /></div>
-            <div className="grid gap-8 xl:grid-cols-3"><InfoSection eyebrow="Platform" title="Mobile" icon={MonitorSmartphone} value={proposal.mobile} /><InfoSection eyebrow="Application" title="Backend" icon={Database} value={proposal.backend} /><InfoSection eyebrow="Infrastructure" title="DevOps" icon={ServerCog} value={proposal.devops} /></div>
-            <InfoSection eyebrow="Engineering" title="Technical scope" description="The technical architecture, platforms and implementation considerations behind the solution." icon={Code2} value={proposal.technical_scope} />
-            <InfoSection eyebrow="Security" title="Security & protection" icon={ShieldCheck} value={proposal.security} />
-            <InfoSection eyebrow="Handover" title="Deliverables" icon={PackageCheck} value={proposal.deliverables} />
-            <TimelineSection timeline={proposal.timeline} milestones={proposal.milestones} />
-            <InfoSection eyebrow="Planning" title="Recommended requirements" icon={Sparkles} value={proposal.recommended_requirements} />
-            <InfoSection eyebrow="Future roadmap" title="Optional future opportunities" icon={Rocket} value={proposal.optional_future_features} />
-            <InfoSection eyebrow="Commercial notes" title="Recurring costs" icon={CircleDollarSign} value={proposal.recurring_costs} />
-            {(hasValue(proposal.assumptions) || hasValue(proposal.exclusions)) && <section><SectionHeading eyebrow="Project boundaries" title="Assumptions & exclusions" description="Important context for understanding what the proposal assumes and what sits outside the current scope." icon={FileText} /><div className="grid gap-4 md:grid-cols-2"><Card className="p-6"><h3 className="mb-4 font-black dark:text-white">Assumptions</h3>{hasValue(proposal.assumptions) ? <SmartValue value={proposal.assumptions} /> : <EmptyState />}</Card><Card className="p-6"><h3 className="mb-4 font-black dark:text-white">Exclusions</h3>{hasValue(proposal.exclusions) ? <SmartValue value={proposal.exclusions} /> : <EmptyState />}</Card></div></section>}
+    const toggleQuoteItem = (item) => {
+        const nextDraft = quoteDraft.map((x) =>
+            x.id === item.id ? { ...x, included: !x.included, quantity: !x.included ? Math.max(1, Number(x.quantity || 1)) : x.quantity } : x
+        );
+        if (!nextDraft.some((x) => x.included)) {
+            setError("At least one quotation item must remain included.");
+            return;
+        }
+        setQuoteDraft(nextDraft);
+        setQuoteDirty(true);
+        setNotice("");
+        previewQuotation(nextDraft);
+    };
 
-            <section className="overflow-hidden rounded-[30px] bg-gradient-to-br from-blue-700 via-indigo-700 to-slate-950 p-7 text-white shadow-2xl shadow-blue-900/10 sm:p-10"><div className="max-w-3xl"><p className="text-[11px] font-black uppercase tracking-[0.22em] text-blue-200">Ready when you are</p><h2 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">A clear scope. A clear investment. A practical path forward.</h2><p className="mt-4 text-sm leading-7 text-blue-100">Review the details above, make any available scope or quotation edits, then accept the proposal when everything reflects what you want AB Technologies to deliver.</p>{proposal.client_editable && !["accepted", "rejected", "expired", "cancelled"].includes(proposal.status) && <button onClick={() => setModal("accept")} className="mt-7 inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3.5 text-sm font-black text-blue-700">Accept proposal <ArrowRight size={16} /></button>}</div></section>
-        </div><ProposalSidebar proposal={proposal} onAccept={() => setModal("accept")} onDecline={() => setModal("decline")} /></div></main>
+    const saveQuotation = async () => {
+        setAction("save-quote");
+        setError("");
+        setNotice("");
+        try {
+            const response = await fetch(endpoint(`/api/proposals/client/${publicToken}/quotation/update/`), {
+                method: "POST",
+                headers: { "Content-Type": "application/json", Accept: "application/json" },
+                credentials: "same-origin",
+                body: JSON.stringify(quotationPayload()),
+            });
+            const data = await response.json().catch(() => null);
+            if (!response.ok || !data?.success) throw new Error(apiError(data, "Unable to save quotation."));
 
-        <footer className="border-t border-slate-200 bg-white py-8 dark:border-white/[0.07] dark:bg-[#070b14]"><div className="mx-auto flex max-w-7xl flex-col gap-4 px-5 text-xs text-slate-500 sm:px-6 md:flex-row md:items-center md:justify-between lg:px-8"><p>© {new Date().getFullYear()} AB Technologies. Proposal information is confidential and intended for the named client.</p><div className="flex flex-wrap gap-4">{proposal.client?.email && <span className="flex items-center gap-1.5"><Mail size={13} />{proposal.client.email}</span>}{proposal.client?.country && <span className="flex items-center gap-1.5"><MapPin size={13} />{proposal.client.country}</span>}</div></div></footer>
+            setProposal((p) => ({
+                ...p,
+                quotation: data.quotation || p.quotation,
+                total_price: data.total_price ?? p.total_price,
+                formatted_total: data.formatted_total || p.formatted_total,
+            }));
 
-        <ActionModal type="accept" proposal={proposal} open={modal === "accept"} onClose={() => setModal(null)} onComplete={async (data) => { await loadProposal(true); setToast(data?.message || "Proposal accepted successfully."); }} />
-        <ActionModal type="decline" proposal={proposal} open={modal === "decline"} onClose={() => setModal(null)} onComplete={async (data) => { await loadProposal(true); setToast(data?.message || "Proposal declined."); }} />
-        {toast && <div className="fixed bottom-5 left-1/2 z-[120] -translate-x-1/2 rounded-2xl border border-white/10 bg-slate-950 px-5 py-3 text-sm font-bold text-white shadow-2xl">{toast}</div>}
-    </div>;
+            if (data.quotation) {
+                setQuotePreview(data.quotation);
+                setQuoteDraft((data.quotation.items || []).map((item) => ({
+                    ...item,
+                    quantity: Number(item.quantity || 0),
+                    included: Number(item.quantity || 0) > 0,
+                })));
+            }
+
+            setQuoteDirty(false);
+            setNotice(data.message || "Quotation saved successfully.");
+            await fetchProposal({ quiet: true });
+        } catch (e) {
+            setError(e.message || "Unable to save quotation.");
+        } finally {
+            setAction("");
+        }
+    };
+
+    const toggleFeature = async (feature) => {
+        setAction(`feature-${feature.id}`);
+        setError("");
+        setNotice("");
+        try {
+            const response = await fetch(endpoint(`/api/proposals/client/${publicToken}/features/${feature.id}/toggle/`), {
+                method: "POST",
+                headers: { Accept: "application/json" },
+                credentials: "same-origin",
+            });
+            const data = await response.json().catch(() => null);
+            if (!response.ok || !data?.success) throw new Error(apiError(data, "Unable to update this feature."));
+
+            setProposal((p) => ({
+                ...p,
+                total_price: data.proposal_total ?? p.total_price,
+                formatted_total: data.formatted_total || p.formatted_total,
+            }));
+
+            setNotice("Proposal scope updated.");
+            await fetchProposal({ quiet: true });
+        } catch (e) {
+            setError(e.message || "Unable to update this feature.");
+        } finally {
+            setAction("");
+        }
+    };
+
+    const acceptProposal = async () => {
+        setAction("accept");
+        setError("");
+        try {
+            const payload = { comment: acceptComment.trim() };
+            if (proposal?.quotation) payload.items = quotationPayload().items;
+
+            const response = await fetch(endpoint(`/api/proposals/client/${publicToken}/accept/`), {
+                method: "POST",
+                headers: { "Content-Type": "application/json", Accept: "application/json" },
+                credentials: "same-origin",
+                body: JSON.stringify(payload),
+            });
+            const data = await response.json().catch(() => null);
+            if (!response.ok || !data?.success) throw new Error(apiError(data, "Unable to accept this proposal."));
+
+            setAcceptOpen(false);
+            setNotice(data.message || "Proposal accepted successfully.");
+            await fetchProposal({ quiet: true });
+        } catch (e) {
+            setError(e.message || "Unable to accept this proposal.");
+        } finally {
+            setAction("");
+        }
+    };
+
+    const declineProposal = async () => {
+        if (declineComment.trim().length < 5) {
+            setError("Please provide a short reason for declining the proposal.");
+            return;
+        }
+        setAction("decline");
+        setError("");
+        try {
+            const response = await fetch(endpoint(`/api/proposals/client/${publicToken}/decline/`), {
+                method: "POST",
+                headers: { "Content-Type": "application/json", Accept: "application/json" },
+                credentials: "same-origin",
+                body: JSON.stringify({ comment: declineComment.trim() }),
+            });
+            const data = await response.json().catch(() => null);
+            if (!response.ok || !data?.success) throw new Error(apiError(data, "Unable to decline this proposal."));
+            setDeclineOpen(false);
+            setNotice(data.message || "Proposal declined.");
+            await fetchProposal({ quiet: true });
+        } catch (e) {
+            setError(e.message || "Unable to decline this proposal.");
+        } finally {
+            setAction("");
+        }
+    };
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-[#f4f7fb]">
+                <div className="mx-auto flex min-h-screen max-w-6xl items-center justify-center px-5">
+                    <div className="text-center">
+                        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl bg-slate-950 text-white shadow-xl">
+                            <Loader2 className="animate-spin" />
+                        </div>
+                        <div className="mt-5 text-sm font-black uppercase tracking-[0.2em] text-slate-400">Preparing your proposal</div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    if (!proposal) {
+        return (
+            <div className="min-h-screen bg-[#f4f7fb] px-5 py-20">
+                <div className="mx-auto max-w-xl rounded-[30px] border border-red-200 bg-white p-8 text-center shadow-xl">
+                    <XCircle className="mx-auto text-red-500" size={42} />
+                    <h1 className="mt-4 text-2xl font-black text-slate-950">Proposal unavailable</h1>
+                    <p className="mt-2 text-slate-500">{error || "We could not load this proposal."}</p>
+                    <button onClick={() => fetchProposal()} className="mt-6 inline-flex items-center gap-2 rounded-xl bg-slate-950 px-5 py-3 font-black text-white">
+                        <RefreshCw size={17} /> Try again
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
+    const client = proposal.client || {};
+    const clientName = client.name || proposal.client_name || "Valued Client";
+    const clientEmail = client.email || proposal.client_email;
+    const required = proposal.required_features || [];
+    const recommended = proposal.recommended_features || [];
+    const optional = proposal.optional_features || [];
+    const quotation = quotePreview || proposal.quotation;
+
+    return (
+        <div className="min-h-screen bg-[#f4f7fb] text-slate-900">
+            <div className="pointer-events-none fixed inset-x-0 top-0 h-[520px] bg-[radial-gradient(circle_at_20%_10%,rgba(37,99,235,0.11),transparent_34%),radial-gradient(circle_at_80%_10%,rgba(124,58,237,0.09),transparent_30%)]" />
+
+            <main className="relative mx-auto max-w-7xl px-4 pb-36 pt-5 sm:px-6 sm:pt-8 lg:px-8">
+                {proposal.status === "accepted" && (
+                    <div className="mb-5 flex items-start gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-800">
+                        <CheckCircle2 className="mt-0.5 shrink-0" size={20} />
+                        <div>
+                            <div className="font-black">Proposal accepted</div>
+                            <div className="mt-0.5 text-sm">The agreed scope and commercial terms are now being processed by AB Technologies.</div>
+                        </div>
+                    </div>
+                )}
+
+                {notice && (
+                    <div className="mb-5 flex items-start justify-between gap-3 rounded-2xl border border-emerald-200 bg-white p-4 shadow-sm">
+                        <div className="flex gap-3 text-emerald-700"><CheckCircle2 size={20} /><span className="text-sm font-bold">{notice}</span></div>
+                        <button onClick={() => setNotice("")}><X size={18} className="text-slate-400" /></button>
+                    </div>
+                )}
+
+                {error && (
+                    <div className="mb-5 flex items-start justify-between gap-3 rounded-2xl border border-red-200 bg-white p-4 shadow-sm">
+                        <div className="flex gap-3 text-red-700"><XCircle size={20} /><span className="text-sm font-bold">{error}</span></div>
+                        <button onClick={() => setError("")}><X size={18} className="text-slate-400" /></button>
+                    </div>
+                )}
+
+                <header className="relative overflow-hidden rounded-[34px] bg-slate-950 px-5 py-7 text-white shadow-2xl shadow-slate-300/50 sm:px-9 sm:py-10 lg:px-12 lg:py-12">
+                    <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-blue-600/20 blur-3xl" />
+                    <div className="absolute -bottom-32 left-1/3 h-72 w-72 rounded-full bg-violet-600/15 blur-3xl" />
+                    <div className="relative">
+                        <div className="flex flex-col justify-between gap-8 lg:flex-row lg:items-start">
+                            <div className="max-w-4xl">
+                                <div className="mb-8 flex items-center gap-3">
+                                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-lg font-black text-slate-950">AB</div>
+                                    <div>
+                                        <div className="font-black tracking-[0.15em]">AB TECHNOLOGIES</div>
+                                        <div className="text-xs text-slate-400">Innovate. Build. Solve.</div>
+                                    </div>
+                                </div>
+
+                                <div className="mb-4 flex flex-wrap gap-2">
+                                    <span className="rounded-full border border-white/10 bg-white/10 px-3 py-1.5 text-xs font-bold">Status · {titleize(proposal.status)}</span>
+                                    <span className="rounded-full border border-white/10 bg-white/10 px-3 py-1.5 text-xs font-bold">Proposal v{proposal.version}</span>
+                                    <span className="rounded-full border border-white/10 bg-white/10 px-3 py-1.5 text-xs font-bold">{currency}</span>
+                                </div>
+
+                                <div className="text-xs font-black uppercase tracking-[0.22em] text-blue-300">Prepared for {clientName}</div>
+                                <h1 className="mt-3 max-w-4xl text-3xl font-black leading-[1.08] tracking-[-0.04em] sm:text-5xl lg:text-6xl">{proposal.title}</h1>
+                                {proposal.client_summary && <p className="mt-5 max-w-3xl text-base leading-8 text-slate-300 sm:text-lg">{proposal.client_summary}</p>}
+                            </div>
+
+                            <div className="w-full rounded-[26px] border border-white/10 bg-white/[0.07] p-5 backdrop-blur-sm lg:w-[310px]">
+                                <div className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">Current investment</div>
+                                <div className="mt-2 break-words text-3xl font-black tracking-tight sm:text-4xl">{currentInvestment}</div>
+                                <div className="mt-4 border-t border-white/10 pt-4 text-sm leading-6 text-slate-400">
+                                    This reflects the current saved scope and commercial selection.
+                                </div>
+                                {canEdit && (
+                                    <button onClick={() => setAcceptOpen(true)} className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-white px-4 py-3.5 font-black text-slate-950 transition hover:bg-blue-50">
+                                        Review & Accept <ArrowRight size={17} />
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </header>
+
+                <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_310px]">
+                    <div className="space-y-6">
+                        <Section icon={UserRound} eyebrow="Proposal details" title="Prepared specifically for you" description="Key information associated with this engagement.">
+                            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                                {[
+                                    ["Client", clientName, UserRound],
+                                    ["Email", clientEmail, Mail],
+                                    ["Version", `v${proposal.version}`, FileCheck2],
+                                    ["Valid until", dateText(proposal.expires_at), CalendarDays],
+                                ].filter(([, v]) => v && v !== "—").map(([label, value, Icon]) => (
+                                    <div key={label} className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
+                                        <Icon size={17} className="mb-3 text-blue-600" />
+                                        <div className="text-[10px] font-black uppercase tracking-wider text-slate-400">{label}</div>
+                                        <div className="mt-1 break-words text-sm font-black text-slate-900">{value}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        </Section>
+
+                        {hasValue(proposal.business_objectives) && (
+                            <Section icon={BriefcaseBusiness} eyebrow="Why this project" title="Business Objectives" description="The outcomes this engagement is designed to achieve.">
+                                <SmartValue value={proposal.business_objectives} />
+                            </Section>
+                        )}
+
+                        {proposal.quotation && (
+                            <Section icon={PackageCheck} eyebrow="Commercial quotation" title="Quotation & Procurement" description="Review quantities, specifications and pricing. Changes are recalculated by the server before they are saved.">
+                                <div className="mb-6 flex flex-col justify-between gap-4 rounded-2xl bg-slate-950 p-5 text-white sm:flex-row sm:items-center">
+                                    <div>
+                                        <div className="text-lg font-black">{proposal.quotation.title || "Project Quotation"}</div>
+                                        {proposal.quotation.description && <div className="mt-1 max-w-2xl text-sm leading-6 text-slate-400">{proposal.quotation.description}</div>}
+                                    </div>
+                                    <Badge tone="blue">{titleize(proposal.quotation.status || "priced")}</Badge>
+                                </div>
+
+                                {proposal.quotation.purpose && (
+                                    <div className="mb-5 rounded-2xl border border-blue-100 bg-blue-50/60 p-4 text-sm leading-6 text-slate-600">
+                                        <strong className="text-slate-900">Purpose:</strong> {proposal.quotation.purpose}
+                                    </div>
+                                )}
+
+                                <div className="space-y-4">
+                                    {quoteDraft.map((item) => {
+                                        const previewItem = quotation?.items?.find((x) => String(x.id) === String(item.id)) || item;
+                                        return (
+                                            <div key={item.id} className={`rounded-3xl border p-5 transition ${item.included ? "border-slate-200 bg-white" : "border-slate-200 bg-slate-50 opacity-70"}`}>
+                                                <div className="flex flex-col justify-between gap-4 sm:flex-row">
+                                                    <div>
+                                                        {item.category && <div className="text-[10px] font-black uppercase tracking-[0.16em] text-blue-600">{titleize(item.category)}</div>}
+                                                        <h3 className="mt-1 text-lg font-black text-slate-950">{item.name}</h3>
+                                                        {item.description && <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-500">{item.description}</p>}
+                                                    </div>
+                                                    <div className="shrink-0 sm:text-right">
+                                                        <div className="text-[10px] font-black uppercase tracking-wider text-slate-400">Line total</div>
+                                                        <div className="mt-1 text-lg font-black text-slate-950">{money(previewItem.total_price, currency)}</div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                                                    {item.brand && <div className="rounded-xl bg-slate-50 p-3"><div className="text-[10px] font-black uppercase text-slate-400">Brand</div><div className="mt-1 text-sm font-bold">{item.brand}</div></div>}
+                                                    {item.model && <div className="rounded-xl bg-slate-50 p-3"><div className="text-[10px] font-black uppercase text-slate-400">Model</div><div className="mt-1 text-sm font-bold">{item.model}</div></div>}
+                                                    <div className="rounded-xl bg-slate-50 p-3"><div className="text-[10px] font-black uppercase text-slate-400">Unit price</div><div className="mt-1 text-sm font-bold">{money(item.unit_price, currency)}</div></div>
+                                                    <div className="rounded-xl bg-slate-50 p-3">
+                                                        <div className="text-[10px] font-black uppercase text-slate-400">Quantity</div>
+                                                        {canEdit && item.included ? (
+                                                            <div className="mt-1 flex items-center gap-2">
+                                                                <button onClick={() => changeQuantity(item, -1)} className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white hover:bg-slate-100"><Minus size={14} /></button>
+                                                                <span className="min-w-8 text-center text-sm font-black">{item.quantity}</span>
+                                                                <button onClick={() => changeQuantity(item, 1)} className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white hover:bg-slate-100"><Plus size={14} /></button>
+                                                            </div>
+                                                        ) : <div className="mt-1 text-sm font-bold">{item.quantity}</div>}
+                                                    </div>
+                                                </div>
+
+                                                {hasValue(item.specifications) && (
+                                                    <div className="mt-4 border-t border-slate-100 pt-4">
+                                                        <div className="mb-3 text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">Specifications</div>
+                                                        <SmartValue value={item.specifications} />
+                                                    </div>
+                                                )}
+
+                                                {canEdit && (
+                                                    <button onClick={() => toggleQuoteItem(item)} className={`mt-4 inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-black ${item.included ? "bg-red-50 text-red-700 hover:bg-red-100" : "bg-blue-600 text-white hover:bg-blue-700"}`}>
+                                                        {item.included ? <Trash2 size={15} /> : <Plus size={15} />}
+                                                        {item.included ? "Remove item" : "Restore item"}
+                                                    </button>
+                                                )}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+
+                                <div className="mt-6 ml-auto max-w-lg rounded-3xl bg-slate-50 p-5">
+                                    {[
+                                        ["Subtotal", quotation?.subtotal],
+                                        ["Discount", quotation?.discount, true],
+                                        ["Tax", quotation?.tax],
+                                        ["Delivery", quotation?.delivery_fee],
+                                    ].filter(([, v]) => v !== null && v !== undefined && Number(v) !== 0).map(([label, value, negative]) => (
+                                        <div key={label} className="flex justify-between gap-5 py-2 text-sm text-slate-500">
+                                            <span>{label}</span><strong className="text-slate-900">{negative ? "- " : ""}{money(value, currency)}</strong>
+                                        </div>
+                                    ))}
+                                    <div className="mt-2 flex justify-between gap-5 border-t border-slate-200 pt-4">
+                                        <span className="font-black text-slate-950">Quotation Total</span>
+                                        <span className="text-xl font-black text-slate-950">{quotation?.formatted_total || money(quotation?.total, currency)}</span>
+                                    </div>
+                                </div>
+
+                                {canEdit && (
+                                    <div className="mt-5 flex flex-col items-stretch justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-4 sm:flex-row sm:items-center">
+                                        <div>
+                                            <div className="text-sm font-black text-slate-950">{quoteDirty ? "You have unsaved quotation changes" : "Quotation is saved"}</div>
+                                            <div className="mt-1 text-xs text-slate-500">Only quantity and inclusion can be changed. Prices remain controlled by AB Technologies.</div>
+                                        </div>
+                                        <button
+                                            disabled={!quoteDirty || action === "save-quote"}
+                                            onClick={saveQuotation}
+                                            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-black text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-40"
+                                        >
+                                            {action === "save-quote" ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+                                            Save Quotation
+                                        </button>
+                                    </div>
+                                )}
+                            </Section>
+                        )}
+
+                        {(required.length > 0 || recommended.length > 0 || optional.length > 0) && (
+                            <Section icon={Layers3} eyebrow="Project scope" title="Features & Scope" description="Required items are fixed. Recommended and optional items can be adjusted before acceptance where editing is enabled.">
+                                {required.length > 0 && <div className="mb-7"><h3 className="mb-3 text-sm font-black uppercase tracking-wider text-slate-500">Required</h3><div className="grid gap-3">{required.map((f) => <FeatureCard key={f.id} feature={f} kind="required" editable={canEdit} busy={action === `feature-${f.id}`} onToggle={toggleFeature} currency={currency} />)}</div></div>}
+                                {recommended.length > 0 && <div className="mb-7"><h3 className="mb-3 text-sm font-black uppercase tracking-wider text-slate-500">Recommended & Included</h3><div className="grid gap-3">{recommended.map((f) => <FeatureCard key={f.id} feature={f} kind="recommended" editable={canEdit} busy={action === `feature-${f.id}`} onToggle={toggleFeature} currency={currency} />)}</div></div>}
+                                {optional.length > 0 && <div><h3 className="mb-3 text-sm font-black uppercase tracking-wider text-slate-500">Optional / Future</h3><div className="grid gap-3">{optional.map((f) => <FeatureCard key={f.id} feature={f} kind="optional" editable={canEdit} busy={action === `feature-${f.id}`} onToggle={toggleFeature} currency={currency} />)}</div></div>}
+                            </Section>
+                        )}
+
+                        {Array.isArray(proposal.screens) && proposal.screens.length > 0 && (
+                            <Section icon={Globe2} eyebrow="User experience" title="Pages & Screens" description="Expected interfaces and experiences included in the project scope.">
+                                <div className="grid gap-3 sm:grid-cols-2">
+                                    {proposal.screens.map((screen) => (
+                                        <div key={screen.id || screen.name} className="rounded-2xl border border-slate-200 p-4">
+                                            <div className="flex flex-wrap items-center gap-2"><h3 className="font-black text-slate-950">{screen.name}</h3>{screen.screen_type && <Badge>{titleize(screen.screen_type)}</Badge>}</div>
+                                            {screen.purpose && <p className="mt-2 text-sm leading-6 text-slate-500">{screen.purpose}</p>}
+                                            {hasValue(screen.key_functionality) && <div className="mt-3"><SmartValue value={screen.key_functionality} /></div>}
+                                        </div>
+                                    ))}
+                                </div>
+                            </Section>
+                        )}
+
+                        {Array.isArray(proposal.requirements) && proposal.requirements.length > 0 && (
+                            <Section icon={CheckCircle2} eyebrow="Requirements" title="Project Requirements" description="Functional and delivery requirements identified for this engagement.">
+                                <div className="grid gap-3">
+                                    {proposal.requirements.map((r) => (
+                                        <div key={r.id || r.title} className="rounded-2xl border border-slate-200 p-4">
+                                            <div className="flex flex-wrap items-center gap-2"><h3 className="font-black">{r.title}</h3>{r.requirement_type && <Badge tone="blue">{titleize(r.requirement_type)}</Badge>}</div>
+                                            {r.description && <p className="mt-2 text-sm leading-6 text-slate-500">{r.description}</p>}
+                                        </div>
+                                    ))}
+                                </div>
+                            </Section>
+                        )}
+
+                        {hasValue(proposal.deliverables) && <Section icon={FileCheck2} eyebrow="What you receive" title="Deliverables"><SmartValue value={proposal.deliverables} /></Section>}
+                        {hasValue(proposal.timeline) && <Section icon={Clock3} eyebrow="Delivery plan" title="Project Timeline"><SmartValue value={proposal.timeline} /></Section>}
+                        {hasValue(proposal.milestones) && <Section icon={CalendarDays} eyebrow="Execution" title="Milestones"><SmartValue value={proposal.milestones} /></Section>}
+                        {hasValue(proposal.integrations) && <Section icon={Cpu} eyebrow="Connected systems" title="Integrations"><SmartValue value={proposal.integrations} /></Section>}
+                        {hasValue(proposal.technical_scope) && <Section icon={Cpu} eyebrow="Implementation" title="Technical Scope"><SmartValue value={proposal.technical_scope} /></Section>}
+                        {hasValue(proposal.scope) && <Section icon={Layers3} eyebrow="Engagement" title="Scope of Work"><SmartValue value={proposal.scope} /></Section>}
+                        {hasValue(proposal.security) && <Section icon={ShieldCheck} eyebrow="Protection" title="Security"><SmartValue value={proposal.security} /></Section>}
+                        {hasValue(proposal.recurring_costs) && <Section icon={CircleDollarSign} eyebrow="Ongoing costs" title="Recurring Costs"><SmartValue value={proposal.recurring_costs} /></Section>}
+
+                        {(hasValue(proposal.assumptions) || hasValue(proposal.exclusions)) && (
+                            <Section icon={FileText} eyebrow="Commercial clarity" title="Assumptions & Exclusions">
+                                <div className="grid gap-5 lg:grid-cols-2">
+                                    {hasValue(proposal.assumptions) && <div><h3 className="mb-3 font-black text-slate-950">Assumptions</h3><SmartValue value={proposal.assumptions} /></div>}
+                                    {hasValue(proposal.exclusions) && <div><h3 className="mb-3 font-black text-slate-950">Exclusions</h3><SmartValue value={proposal.exclusions} /></div>}
+                                </div>
+                            </Section>
+                        )}
+                    </div>
+
+                    <aside className="hidden lg:block">
+                        <div className="sticky top-6 rounded-[28px] bg-slate-950 p-5 text-white shadow-2xl">
+                            <div className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.18em] text-blue-300"><Sparkles size={14} /> Proposal summary</div>
+                            <div className="mt-5 text-[10px] font-black uppercase tracking-wider text-slate-500">Current investment</div>
+                            <div className="mt-1 break-words text-3xl font-black">{currentInvestment}</div>
+                            <div className="mt-5 space-y-3 border-t border-white/10 pt-5 text-sm">
+                                <div className="flex justify-between gap-4"><span className="text-slate-400">Status</span><strong>{titleize(proposal.status)}</strong></div>
+                                <div className="flex justify-between gap-4"><span className="text-slate-400">Version</span><strong>v{proposal.version}</strong></div>
+                                {proposal.expires_at && <div className="flex justify-between gap-4"><span className="text-slate-400">Valid until</span><strong className="text-right">{dateText(proposal.expires_at)}</strong></div>}
+                            </div>
+
+                            {quoteDirty && <div className="mt-5 rounded-2xl border border-amber-400/20 bg-amber-400/10 p-3 text-xs leading-5 text-amber-200">Save your quotation changes before accepting if you want them stored immediately.</div>}
+
+                            {canEdit && (
+                                <div className="mt-5 grid gap-2">
+                                    <button onClick={() => setAcceptOpen(true)} className="flex items-center justify-center gap-2 rounded-xl bg-white px-4 py-3 font-black text-slate-950 hover:bg-blue-50"><Check size={17} /> Accept Proposal</button>
+                                    <button onClick={() => setDeclineOpen(true)} className="rounded-xl border border-white/10 px-4 py-3 text-sm font-bold text-slate-300 hover:bg-white/5">Decline / Request changes</button>
+                                </div>
+                            )}
+                        </div>
+                    </aside>
+                </div>
+
+                <footer className="py-10 text-center text-xs leading-6 text-slate-400">
+                    <strong className="text-slate-600">AB Technologies</strong><br />
+                    Innovate. Build. Solve.<br /><br />
+                    This proposal reflects the scope and pricing available at the time it was issued. Changes to scope, specifications, quantities or commercial terms may require an updated proposal.
+                </footer>
+            </main>
+
+            <div className="fixed inset-x-3 bottom-3 z-40 rounded-[22px] bg-slate-950 p-3 text-white shadow-2xl lg:hidden">
+                <div className="flex items-center justify-between gap-3">
+                    <div className="min-w-0">
+                        <div className="text-[9px] font-black uppercase tracking-wider text-slate-500">Current investment</div>
+                        <div className="truncate text-lg font-black">{currentInvestment}</div>
+                    </div>
+                    {canEdit && <button onClick={() => setAcceptOpen(true)} className="shrink-0 rounded-xl bg-white px-4 py-3 text-sm font-black text-slate-950">Review & Accept</button>}
+                </div>
+            </div>
+
+            <Modal open={acceptOpen} onClose={() => setAcceptOpen(false)} title="Accept this proposal?" description="You are confirming the current scope, saved quotation selections and commercial terms.">
+                <div className="rounded-2xl bg-slate-50 p-4">
+                    <div className="text-[10px] font-black uppercase tracking-wider text-slate-400">Current investment</div>
+                    <div className="mt-1 text-2xl font-black text-slate-950">{currentInvestment}</div>
+                </div>
+                {quoteDirty && (
+                    <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-800">
+                        Your quotation has unsaved changes. Acceptance will submit the current item selections, but use <strong>Save Quotation</strong> first if you want the quotation itself updated before acceptance.
+                    </div>
+                )}
+                <label className="mt-5 block text-sm font-black text-slate-800">Comment <span className="font-normal text-slate-400">(optional)</span></label>
+                <textarea value={acceptComment} onChange={(e) => setAcceptComment(e.target.value)} rows={4} maxLength={5000} placeholder="Any final note for AB Technologies..." className="mt-2 w-full rounded-2xl border border-slate-200 p-4 text-sm outline-none focus:border-blue-500" />
+                <div className="mt-5 flex gap-3">
+                    <button onClick={() => setAcceptOpen(false)} className="flex-1 rounded-xl border border-slate-200 px-4 py-3 font-black text-slate-600">Cancel</button>
+                    <button disabled={action === "accept"} onClick={acceptProposal} className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3 font-black text-white disabled:opacity-50">
+                        {action === "accept" ? <Loader2 size={17} className="animate-spin" /> : <CheckCircle2 size={17} />} Confirm Acceptance
+                    </button>
+                </div>
+            </Modal>
+
+            <Modal open={declineOpen} onClose={() => setDeclineOpen(false)} title="Decline or request changes" description="Tell AB Technologies what needs to change. A short reason is required.">
+                <label className="block text-sm font-black text-slate-800">Reason</label>
+                <textarea value={declineComment} onChange={(e) => setDeclineComment(e.target.value)} rows={5} placeholder="Please explain what you would like changed..." className="mt-2 w-full rounded-2xl border border-slate-200 p-4 text-sm outline-none focus:border-red-400" />
+                <div className="mt-5 flex gap-3">
+                    <button onClick={() => setDeclineOpen(false)} className="flex-1 rounded-xl border border-slate-200 px-4 py-3 font-black text-slate-600">Cancel</button>
+                    <button disabled={action === "decline" || declineComment.trim().length < 5} onClick={declineProposal} className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-3 font-black text-white disabled:opacity-40">
+                        {action === "decline" ? <Loader2 size={17} className="animate-spin" /> : <XCircle size={17} />} Send Response
+                    </button>
+                </div>
+            </Modal>
+        </div>
+    );
 }
