@@ -58,9 +58,22 @@ import {
     Presentation,
     MonitorSmartphone,
 } from "lucide-react";
-
+import SEO from "../SEO";
 import { queueSupportRequest } from "../AI";
-
+<SEO
+    title="AI Automation & Business Process Automation"
+    description="Automate business processes with AI-powered workflows, intelligent systems and custom automation solutions from AB Technologies."
+    path="/services/ai-automation"
+    schema={{
+        "@context": "https://schema.org",
+        "@type": "Service",
+        "name": "AI Automation",
+        "provider": {
+            "@type": "Organization",
+            "name": "AB Technologies"
+        }
+    }}
+/>
 
 const solutions = [
     {

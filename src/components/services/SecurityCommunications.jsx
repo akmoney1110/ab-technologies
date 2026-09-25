@@ -35,9 +35,22 @@ import {
     X,
     Zap,
 } from "lucide-react";
-
+import SEO from "../SEO";
 import { queueSupportRequest } from "../AI";
-
+<SEO
+    title="Security, CCTV & Communication Solutions"
+    description="AB Technologies provides CCTV, surveillance, security infrastructure and business communication technology solutions."
+    path="/services/security-communications"
+    schema={{
+        "@context": "https://schema.org",
+        "@type": "Service",
+        "name": "Security and Communication Solutions",
+        "provider": {
+            "@type": "Organization",
+            "name": "AB Technologies"
+        }
+    }}
+/>
 export default function SecurityCommunication() {
     const navigate = useNavigate();
 

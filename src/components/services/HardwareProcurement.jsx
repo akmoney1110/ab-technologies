@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import SEO from "../SEO";
 import {
     ArrowRight,
     ArrowUpRight,
@@ -55,7 +55,22 @@ import { queueSupportRequest } from "../AI";
 ========================================================= */
 
 const SUPPORT_SOURCE = "Hardware & Device Procurement";
-
+<SEO
+    title="IT Hardware Procurement & Technology Supply"
+    description="AB Technologies provides professional IT hardware procurement, technology sourcing, equipment supply and deployment solutions for businesses and organizations."
+    path="/services/hardware-procurement"
+    schema={{
+        "@context": "https://schema.org",
+        "@type": "Service",
+        "name": "IT Hardware Procurement",
+        "provider": {
+            "@type": "Organization",
+            "name": "AB Technologies"
+        },
+        "url": "https://abtechnologies.com/services/hardware-procurement",
+        "description": "IT hardware procurement, technology sourcing, equipment supply and deployment services."
+    }}
+/>
 
 /* =========================================================
    DATA
@@ -1910,8 +1925,8 @@ function QuoteModal({
                             <React.Fragment key={item}>
                                 <div
                                     className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-black ${step >= item
-                                            ? "bg-blue-600 text-white"
-                                            : "bg-slate-200 text-slate-500 dark:bg-white/[0.08] dark:text-slate-400"
+                                        ? "bg-blue-600 text-white"
+                                        : "bg-slate-200 text-slate-500 dark:bg-white/[0.08] dark:text-slate-400"
                                         }`}
                                 >
                                     {item}
@@ -1920,8 +1935,8 @@ function QuoteModal({
                                 {item !== 3 && (
                                     <div
                                         className={`h-px flex-1 ${step > item
-                                                ? "bg-blue-600"
-                                                : "bg-slate-200 dark:bg-white/[0.08]"
+                                            ? "bg-blue-600"
+                                            : "bg-slate-200 dark:bg-white/[0.08]"
                                             }`}
                                     />
                                 )}

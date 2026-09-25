@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-
+import SEO from "../SEO";
 import {
     ArrowDown,
     ArrowRight,
@@ -54,7 +54,22 @@ import { queueSupportRequest } from "../AI";
 /* =========================================================
    DATA
    ========================================================= */
-
+<SEO
+    title="Custom Software Development & Business Solutions"
+    description="AB Technologies designs and develops custom software, web applications, business platforms, automation systems and enterprise technology solutions."
+    path="/services/software-solutions"
+    schema={{
+        "@context": "https://schema.org",
+        "@type": "Service",
+        "name": "Custom Software Development",
+        "provider": {
+            "@type": "Organization",
+            "name": "AB Technologies"
+        },
+        "url": "https://abtechnologies.com/services/software-solutions",
+        "description": "Custom software development, web applications, business systems and enterprise technology solutions."
+    }}
+/>
 const solutionCategories = [
     {
         id: "custom-software",

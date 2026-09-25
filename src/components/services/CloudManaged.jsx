@@ -61,9 +61,22 @@ import {
     X,
     Zap,
 } from "lucide-react";
-
+import SEO from "../SEO";
 import { queueSupportRequest } from "../AI";
-
+<SEO
+    title="Cloud Infrastructure & Managed IT Services"
+    description="Cloud infrastructure, IT management, deployment, monitoring and technical support solutions for businesses and organizations."
+    path="/services/cloud-managed-it"
+    schema={{
+        "@context": "https://schema.org",
+        "@type": "Service",
+        "name": "Cloud and Managed IT Services",
+        "provider": {
+            "@type": "Organization",
+            "name": "AB Technologies"
+        }
+    }}
+/>
 const CloudManagedIT = () => {
     const navigate = useNavigate();
 

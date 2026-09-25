@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { queueSupportRequest } from "./AI";
+import { Search } from "lucide-react";
 
 import {
     Menu,
@@ -328,6 +329,23 @@ export default function Navbar() {
                             }
                         `}
                     >
+                        <Link
+                            to="/track-procurement"
+                            className={`
+        flex
+        items-center
+        gap-1.5
+        transition-colors
+        duration-200
+        ${darkMode
+                                    ? "hover:text-sky-400"
+                                    : "hover:text-sky-600"
+                                }
+    `}
+                        >
+                            <Search size={12} />
+                            <span>Track Procurement</span>
+                        </Link>
                         <Link
                             to="/support"
                             className={`

@@ -74,9 +74,22 @@ import {
     X,
     Zap,
 } from "lucide-react";
-
+import SEO from "../SEO";
 const cn = (...classes) => classes.filter(Boolean).join(" ");
-
+<SEO
+    title="Business Networking & IT Infrastructure Services"
+    description="Professional network design, installation, configuration and IT infrastructure services from AB Technologies."
+    path="/services/networking"
+    schema={{
+        "@context": "https://schema.org",
+        "@type": "Service",
+        "name": "Network Infrastructure Services",
+        "provider": {
+            "@type": "Organization",
+            "name": "AB Technologies"
+        }
+    }}
+/>
 const primaryNavigation = [
     {
         label: "Services",

@@ -51,9 +51,13 @@ import {
     Menu,
     X,
 } from "lucide-react";
-
+import SEO from "../SEO";
 import { queueSupportRequest } from "../AI";
-
+<SEO
+    title="IT Deployment, Installation & Technical Support"
+    description="AB Technologies provides professional IT deployment, equipment installation, configuration and technical support for businesses and institutions."
+    path="/services/it-deployment-support"
+/>
 const deploymentServices = [
     {
         icon: Monitor,

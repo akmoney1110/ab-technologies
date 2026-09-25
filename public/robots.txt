@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+Disallow: /portal/
+Disallow: /staff/
+Disallow: /payment/
+Disallow: /payments/
+Disallow: /proposals/
+
+Sitemap: https://abtechbridge.com/sitemap.xml

@@ -43,9 +43,13 @@ import {
     X,
     Zap,
 } from "lucide-react";
-
+import SEO from "../SEO";
 import { queueSupportRequest } from "../AI";
-
+<SEO
+    title="Corporate IT Procurement & Technology Sourcing"
+    description="Corporate technology procurement, vendor sourcing, hardware supply and IT equipment acquisition services for organizations."
+    path="/services/corporate-procurement"
+/>
 const procurementCategories = [
     {
         icon: Boxes,
