@@ -122,6 +122,35 @@ import ClientProposal from "./components/ClientProposal";
 import ClientProcurementProposal from "./components/ClientProcurementProposal";
 import RouteSEO from "./components/RouteSEO";
 
+
+// ============================================================
+// PUBLIC PROCUREMENT ROUTES
+// ============================================================
+//
+// These are normal public website pages.
+//
+// They MUST:
+// - display ABNav
+// - behave like the rest of the public website
+//
+// They must NOT be confused with:
+//
+// /procurement/:publicToken
+//
+// which is a transactional/client procurement page.
+// ============================================================
+
+const PUBLIC_PROCUREMENT_ROUTES = [
+  "/procurement/institutional",
+  "/procurement/suppliers",
+  "/procurement/verification",
+  "/procurement/hardware",
+  "/procurement/international",
+  "/procurement/quotations",
+  "/procurement/logistics",
+];
+
+
 // ============================================================
 // APP CONTENT
 // ============================================================
@@ -132,138 +161,197 @@ function AppContent() {
   // THEME
   // ==========================================================
   //
-  // IMPORTANT:
-  // The website starts in DARK MODE.
+  // DARK MODE IS THE DEFAULT.
   //
-  // This matches the default appearance of the rest of
-  // AB Technologies.
+  // We initialize directly from localStorage when available.
   //
-  // The user can still switch the theme through ABNav.
+  // If the user has never selected a theme before,
+  // the website starts in dark mode.
   // ==========================================================
 
-  const [theme, setTheme] = useState("dark");
+  const [theme, setTheme] = useState(() => {
+
+    try {
+
+      const savedTheme = localStorage.getItem("ab-theme");
+
+      if (
+        savedTheme === "dark" ||
+        savedTheme === "light"
+      ) {
+        return savedTheme;
+      }
+
+    } catch (error) {
+
+      console.warn(
+        "Unable to read saved theme:",
+        error
+      );
+
+    }
+
+    return "dark";
+
+  });
+
 
   const location = useLocation();
 
 
   // ==========================================================
-  // APPLY THEME TO HTML ELEMENT
+  // APPLY THEME
   // ==========================================================
 
   useEffect(() => {
 
-    document.documentElement.classList.toggle(
-      "dark",
-      theme === "dark"
-    );
+    const root = document.documentElement;
 
-    // Optional browser color-scheme hint.
-    // This helps browser-native controls use the correct
-    // dark/light appearance as well.
-    document.documentElement.style.colorScheme =
-      theme === "dark"
-        ? "dark"
-        : "light";
+    if (theme === "dark") {
+
+      root.classList.add("dark");
+      root.style.colorScheme = "dark";
+
+    } else {
+
+      root.classList.remove("dark");
+      root.style.colorScheme = "light";
+
+    }
+
+
+    // Save user's choice.
+    try {
+
+      localStorage.setItem(
+        "ab-theme",
+        theme
+      );
+
+    } catch (error) {
+
+      console.warn(
+        "Unable to save theme:",
+        error
+      );
+
+    }
 
   }, [theme]);
+
+
+  // ==========================================================
+  // CURRENT PATH
+  // ==========================================================
+
+  const pathname =
+    location.pathname.toLowerCase();
 
 
   // ==========================================================
   // NAVIGATION VISIBILITY
   // ==========================================================
   //
-  // ABNav is the PUBLIC WEBSITE navigation.
+  // ABNav SHOULD appear on:
   //
-  // We do NOT want the public navigation appearing inside:
+  // /
+  // /services/*
+  // /procurement/institutional
+  // /procurement/suppliers
+  // /procurement/verification
+  // /procurement/hardware
+  // /procurement/international
+  // /procurement/quotations
+  // /procurement/logistics
+  // /solutions/*
+  // /industries/*
+  // /about/*
+  // /resources/*
+  // /contact
+  // /support
   //
-  // - Client portal
-  // - Staff portal
-  // - Procurement tracking
-  // - Client proposal pages
-  // - Client procurement proposal pages
-  // - Procurement details
-  // - Payment pages
-  // - Payment callbacks
   //
-  // These pages are transactional/workspace pages and should
-  // use their own layout/navigation.
+  // ABNav SHOULD NOT appear on:
+  //
+  // /portal/*
+  // /staff/*
+  // /track-procurement
+  // /proposals/:publicToken
+  // /procurement/:publicToken
+  // /payment/*
+  // /payments/*
   // ==========================================================
-
-  const pathname = location.pathname.toLowerCase();
 
 
   // ----------------------------------------------------------
-  // ROUTE GROUPS THAT MUST NOT DISPLAY ABNav
+  // PRIVATE / TRANSACTIONAL PREFIXES
   // ----------------------------------------------------------
 
   const hiddenNavPrefixes = [
-
-    // Client portal
     "/portal",
-
-    // Staff portal
     "/staff",
-
-    // Public procurement tracking
     "/track-procurement",
-
-    // Public client proposal
     "/proposals",
-
-    // Procurement details / client quotation
-    "/procurement/",
-
-    // Payment callback/pages
     "/payment",
-
-    // Future payment route support
     "/payments",
-
   ];
 
 
   // ----------------------------------------------------------
-  // DETERMINE WHETHER NAV SHOULD BE HIDDEN
+  // CHECK PRIVATE PREFIXES
   // ----------------------------------------------------------
 
-  const shouldHidePublicNav = hiddenNavPrefixes.some(
-    (prefix) => {
-
-      // Exact match
-      if (pathname === prefix) {
-        return true;
-      }
-
-      // Example:
-      //
-      // /portal/dashboard
-      // /portal/projects
-      // /portal/payments
-      //
-      if (
+  const isHiddenPrefix =
+    hiddenNavPrefixes.some(
+      (prefix) =>
+        pathname === prefix ||
         pathname.startsWith(
           `${prefix}/`
         )
-      ) {
-        return true;
-      }
+    );
 
-      // Prefixes already ending with /
-      //
-      // Example:
-      //
-      // /procurement/abc123
-      //
-      if (
-        prefix.endsWith("/") &&
-        pathname.startsWith(prefix)
-      ) {
-        return true;
-      }
 
-      return false;
-    }
-  );
+  // ----------------------------------------------------------
+  // CHECK PUBLIC PROCUREMENT ROUTES
+  // ----------------------------------------------------------
+
+  const isPublicProcurementRoute =
+    PUBLIC_PROCUREMENT_ROUTES.includes(
+      pathname
+    );
+
+
+  // ----------------------------------------------------------
+  // DYNAMIC PROCUREMENT PAGE
+  // ----------------------------------------------------------
+  //
+  // Examples:
+  //
+  // /procurement/abc123
+  // /procurement/2da74c...
+  //
+  // These should NOT display ABNav.
+  //
+  // But:
+  //
+  // /procurement/hardware
+  // /procurement/international
+  //
+  // etc. SHOULD display it.
+  // ----------------------------------------------------------
+
+  const isDynamicProcurement =
+    pathname.startsWith("/procurement/") &&
+    !isPublicProcurementRoute;
+
+
+  // ----------------------------------------------------------
+  // FINAL NAV VISIBILITY
+  // ----------------------------------------------------------
+
+  const shouldHidePublicNav =
+    isHiddenPrefix ||
+    isDynamicProcurement;
 
 
   // ==========================================================
@@ -284,8 +372,6 @@ function AppContent() {
 
       {/* =====================================================
           PUBLIC NAVIGATION
-
-          Only display ABNav on normal public website pages.
       ====================================================== */}
 
       {!shouldHidePublicNav && (
@@ -299,14 +385,21 @@ function AppContent() {
 
 
       {/* =====================================================
+          SEO
+      ====================================================== */}
+
+      <RouteSEO />
+
+
+      {/* =====================================================
           ROUTES
       ====================================================== */}
-      <RouteSEO />
+
       <Routes>
 
 
         {/* ===================================================
-            PUBLIC WEBSITE
+            HOME
         ==================================================== */}
 
         <Route
@@ -339,21 +432,6 @@ function AppContent() {
           element={<SecurityCommunications />}
         />
 
-
-        {/* ===================================================
-            PROCUREMENT TRACKING
-
-            ABNav hidden
-        ==================================================== */}
-
-        <Route
-          path="/track-procurement"
-          element={
-            <ProcurementTracking />
-          }
-        />
-
-
         <Route
           path="/services/corporate-procurement"
           element={<CorporateProcurement />}
@@ -362,11 +440,6 @@ function AppContent() {
         <Route
           path="/services/cloud-managed-it"
           element={<CloudManaged />}
-        />
-
-        <Route
-          path="/contact"
-          element={<Contact />}
         />
 
         <Route
@@ -381,7 +454,17 @@ function AppContent() {
 
 
         {/* ===================================================
-            PROCUREMENT PUBLIC PAGES
+            PROCUREMENT TRACKING
+        ==================================================== */}
+
+        <Route
+          path="/track-procurement"
+          element={<ProcurementTracking />}
+        />
+
+
+        {/* ===================================================
+            PUBLIC PROCUREMENT / SOURCING
         ==================================================== */}
 
         <Route
@@ -448,19 +531,6 @@ function AppContent() {
           path="/solutions/business-systems"
           element={<BusinessSystems />}
         />
-
-
-        {/* ===================================================
-            CLIENT PROPOSAL
-
-            ABNav hidden
-        ==================================================== */}
-
-        <Route
-          path="/proposals/:publicToken"
-          element={<ClientProposal />}
-        />
-
 
         <Route
           path="/solutions/automation"
@@ -594,19 +664,37 @@ function AppContent() {
 
 
         {/* ===================================================
-            SUPPORT
+            CONTACT / SUPPORT
         ==================================================== */}
+
+        <Route
+          path="/contact"
+          element={<Contact />}
+        />
 
         <Route
           path="/support"
           element={<Support />}
         />
 
+        <Route
+          path="/support/ai"
+          element={<AI />}
+        />
+
+
+        {/* ===================================================
+            CLIENT PROPOSAL
+        ==================================================== */}
+
+        <Route
+          path="/proposals/:publicToken"
+          element={<ClientProposal />}
+        />
+
 
         {/* ===================================================
             CLIENT PORTAL
-
-            ABNav hidden from ALL /portal routes
         ==================================================== */}
 
         <Route
@@ -623,11 +711,6 @@ function AppContent() {
           path="/portal/projects"
           element={<Project />}
         />
-
-
-        {/* ===================================================
-            STAFF PROJECTS
-        ==================================================== */}
 
         <Route
           path="/portal/staffprojects"
@@ -648,14 +731,8 @@ function AppContent() {
         {/* ===================================================
             CLIENT PROCUREMENT PROPOSAL
 
-            NOTE:
-            This path is preserved exactly from your
-            existing App.js.
-
-            You currently have "proects" here rather than
-            "projects". I have not silently changed the URL
-            because another part of your application may
-            already depend on it.
+            Keeping "proects" exactly as it exists in your
+            current application so existing links do not break.
         ==================================================== */}
 
         <Route
@@ -665,7 +742,7 @@ function AppContent() {
 
 
         {/* ===================================================
-            PORTAL PROCUREMENT LIST
+            PORTAL PROCUREMENT
         ==================================================== */}
 
         <Route
@@ -675,49 +752,39 @@ function AppContent() {
 
 
         {/* ===================================================
-            PUBLIC PROCUREMENT DETAILS / QUOTATION
+            DYNAMIC PUBLIC PROCUREMENT DETAILS
 
-            ABNav hidden
+            ABNav is hidden on this route.
         ==================================================== */}
 
         <Route
           path="/procurement/:publicToken"
-          element={
-            <ProcurementDetails />
-          }
+          element={<ProcurementDetails />}
         />
 
 
         {/* ===================================================
             STAFF PROCUREMENT
-
-            ABNav hidden
         ==================================================== */}
 
         <Route
           path="/staff/procurement"
-          element={
-            <StaffProcurement />
-          }
+          element={<StaffProcurement />}
         />
 
 
         {/* ===================================================
             PAYMENT CALLBACK
-
-            ABNav hidden
         ==================================================== */}
 
         <Route
-          path="payment/callback"
+          path="/payment/callback"
           element={<PaymentCallback />}
         />
 
 
         {/* ===================================================
             PAYMENT HISTORY
-
-            ABNav hidden because this is under /portal
         ==================================================== */}
 
         <Route
@@ -728,23 +795,11 @@ function AppContent() {
 
         {/* ===================================================
             PAYMENT DETAILS
-
-            ABNav hidden because this is under /portal
         ==================================================== */}
 
         <Route
           path="/portal/projects/:projectId/payments/:paymentId"
           element={<PaymentDetail />}
-        />
-
-
-        {/* ===================================================
-            AI SUPPORT
-        ==================================================== */}
-
-        <Route
-          path="/support/ai"
-          element={<AI />}
         />
 
 
