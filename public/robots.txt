@@ -6,5 +6,5 @@ Disallow: /staff/
 Disallow: /payment/
 Disallow: /payments/
 Disallow: /proposals/
-
+Disallow: /track-procurement
 Sitemap: https://abtechbridge.com/sitemap.xml
