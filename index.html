@@ -34,11 +34,48 @@
       content="index, follow, max-image-preview:large"
     />
 
-    <meta name="author" content="AB Technologies" />
+    <meta
+      name="author"
+      content="AB Technologies"
+    />
 
     <link
       rel="canonical"
       href="https://abtechbridge.com/"
+    />
+
+    <!-- =====================================================
+         FAVICON / BROWSER ICONS
+    ====================================================== -->
+
+    <!-- Standard browser favicon -->
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="/favicon-32x32.png?v=5"
+    />
+
+    <!-- High-resolution browser / Android icon -->
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="192x192"
+      href="/favicon-192x192.png?v=5"
+    />
+
+    <!-- Traditional favicon fallback -->
+    <link
+      rel="shortcut icon"
+      type="image/x-icon"
+      href="/favicon.ico?v=5"
+    />
+
+    <!-- Apple / iPhone / iPad icon -->
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="/apple-touch-icon.png?v=5"
     />
 
     <!-- =====================================================
@@ -105,16 +142,6 @@
     />
 
     <!-- =====================================================
-         FAVICON
-    ====================================================== -->
-
-    <link
-      rel="icon"
-      type="image/svg+xml"
-      href="/favicon.svg"
-    />
-
-    <!-- =====================================================
          ORGANIZATION STRUCTURED DATA
     ====================================================== -->
 
@@ -125,7 +152,7 @@
         "@id": "https://abtechbridge.com/#organization",
         "name": "AB Technologies",
         "url": "https://abtechbridge.com/",
-        "logo": "https://abtechbridge.com/favicon.svg",
+        "logo": "https://abtechbridge.com/favicon-192x192.png",
         "description": "AB Technologies provides IT procurement, software development, networking, cloud infrastructure, cybersecurity, AI automation and managed technology solutions."
       }
     </script>
@@ -146,17 +173,14 @@
         }
       }
     </script>
-
   </head>
 
   <body>
-
     <div id="root"></div>
 
     <script
       type="module"
       src="/src/main.jsx"
     ></script>
-
   </body>
 </html>
