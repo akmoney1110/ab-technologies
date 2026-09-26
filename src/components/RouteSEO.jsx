@@ -1,15 +1,24 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 
+/* ============================================================
+   GLOBAL SEO CONFIGURATION
+   ============================================================ */
+
 const SITE_URL = "https://abtechbridge.com";
+const SITE_NAME = "AB Technologies";
 const DEFAULT_IMAGE = `${SITE_URL}/og-image.png`;
 
 const DEFAULT_SEO = {
     title:
-        "AB Technologies | IT Procurement, Software, Cloud, AI & Technology Solutions",
+        "AB Technologies Nigeria | IT Procurement, Software, AI & Managed IT",
     description:
-        "AB Technologies provides IT hardware procurement, custom software development, networking, cloud infrastructure, cybersecurity, AI automation and managed technology services for businesses and organizations.",
+        "AB Technologies is a Nigeria-based technology company providing IT hardware procurement, custom software development, networking, cloud infrastructure, cybersecurity, AI automation and managed IT services for businesses and organizations.",
 };
+
+/* ============================================================
+   PUBLIC SEO ROUTES
+   ============================================================ */
 
 const SEO_ROUTES = {
     "/": DEFAULT_SEO,
@@ -19,51 +28,59 @@ const SEO_ROUTES = {
     // ============================================================
 
     "/services/hardware-procurement": {
-        title: "IT Hardware Procurement Services | AB Technologies",
+        title:
+            "IT Hardware Procurement in Nigeria | AB Technologies",
         description:
-            "Source reliable computers, servers, networking equipment and enterprise IT hardware with AB Technologies' professional technology procurement services.",
+            "AB Technologies provides IT hardware procurement in Nigeria, helping businesses and institutions source computers, servers, networking equipment and enterprise technology.",
     },
 
     "/services/networking": {
-        title: "Networking & IT Infrastructure Services | AB Technologies",
+        title:
+            "Networking & IT Infrastructure in Nigeria | AB Technologies",
         description:
-            "AB Technologies designs, deploys and supports secure business networks, connectivity infrastructure and enterprise networking solutions.",
+            "AB Technologies designs, deploys and supports secure business networks, connectivity infrastructure and enterprise networking solutions for organizations in Nigeria.",
     },
 
     "/services/software-solutions": {
-        title: "Custom Software Development | AB Technologies",
+        title:
+            "Custom Software Development in Nigeria | AB Technologies",
         description:
-            "AB Technologies develops custom web applications, business software and digital platforms designed around your organization's requirements.",
+            "AB Technologies develops custom web applications, business software, digital platforms and technology systems for businesses and organizations in Nigeria.",
     },
 
     "/services/security-communications": {
-        title: "Security & Communication Solutions | AB Technologies",
+        title:
+            "Security & Communication Solutions Nigeria | AB Technologies",
         description:
-            "Deploy modern security, surveillance and communication technology with AB Technologies for businesses, institutions and organizations.",
+            "AB Technologies provides surveillance, security and business communication technology solutions for companies, institutions and organizations in Nigeria.",
     },
 
     "/services/corporate-procurement": {
-        title: "Corporate IT Procurement Services | AB Technologies",
+        title:
+            "Corporate IT Procurement in Nigeria | AB Technologies",
         description:
-            "AB Technologies helps businesses and institutions source technology equipment through structured corporate IT procurement and supplier coordination.",
+            "AB Technologies provides structured corporate IT procurement, technology sourcing and supplier coordination for businesses, institutions and organizations in Nigeria.",
     },
 
     "/services/cloud-managed-it": {
-        title: "Cloud & Managed IT Services | AB Technologies",
+        title:
+            "Cloud & Managed IT Services Nigeria | AB Technologies",
         description:
-            "Cloud infrastructure, managed IT, hosting and technology support services designed to keep modern organizations secure, reliable and productive.",
+            "AB Technologies provides cloud infrastructure, hosting, managed IT and technology support services for businesses and organizations in Nigeria.",
     },
 
     "/services/ai-automation": {
-        title: "AI & Business Automation Solutions | AB Technologies",
+        title:
+            "AI Automation Solutions in Nigeria | AB Technologies",
         description:
-            "Use AI and intelligent automation to streamline operations, improve workflows and build smarter digital processes with AB Technologies.",
+            "AB Technologies delivers AI automation, intelligent workflows and practical artificial intelligence solutions that help businesses streamline operations and improve productivity.",
     },
 
     "/services/it-deployment-support": {
-        title: "IT Deployment & Technical Support | AB Technologies",
+        title:
+            "IT Deployment & Technical Support Nigeria | AB Technologies",
         description:
-            "Professional technology deployment, installation, configuration and ongoing IT support for businesses and organizations.",
+            "Professional IT deployment, installation, configuration and technical support services for businesses, institutions and organizations in Nigeria.",
     },
 
     // ============================================================
@@ -71,45 +88,52 @@ const SEO_ROUTES = {
     // ============================================================
 
     "/procurement/institutional": {
-        title: "Institutional Technology Procurement | AB Technologies",
+        title:
+            "Institutional Technology Procurement Nigeria | AB Technologies",
         description:
-            "Technology procurement services for institutions, organizations and large-scale technology deployments.",
+            "AB Technologies provides structured technology procurement services for institutions, organizations and large-scale IT deployments across Nigeria.",
     },
 
     "/procurement/suppliers": {
-        title: "Technology Supplier Sourcing | AB Technologies",
+        title:
+            "Technology Supplier Sourcing Nigeria | AB Technologies",
         description:
-            "AB Technologies helps organizations identify and coordinate reliable suppliers for hardware, infrastructure and technology procurement.",
+            "AB Technologies helps organizations identify, evaluate and coordinate reliable technology suppliers for hardware, infrastructure and business IT procurement.",
     },
 
     "/procurement/verification": {
-        title: "Technology Procurement Verification | AB Technologies",
+        title:
+            "IT Procurement Verification Services | AB Technologies",
         description:
-            "Improve procurement confidence with technology specification, supplier and equipment verification from AB Technologies.",
+            "Improve procurement confidence with technology specification checks, supplier verification and equipment verification services from AB Technologies.",
     },
 
     "/procurement/hardware": {
-        title: "Business IT Hardware Sourcing | AB Technologies",
+        title:
+            "Business IT Hardware Sourcing Nigeria | AB Technologies",
         description:
-            "Source computers, networking equipment, servers and other business technology hardware through AB Technologies.",
+            "Source computers, laptops, servers, networking equipment and enterprise technology hardware for your organization through AB Technologies.",
     },
 
     "/procurement/international": {
-        title: "International Technology Sourcing | AB Technologies",
+        title:
+            "International Technology Sourcing Nigeria | AB Technologies",
         description:
-            "AB Technologies supports international sourcing and procurement of technology equipment for businesses and institutions.",
+            "AB Technologies supports international sourcing and procurement of technology equipment for Nigerian businesses, institutions and organizations.",
     },
 
     "/procurement/quotations": {
-        title: "Technology Procurement Quotations | AB Technologies",
+        title:
+            "IT Procurement Quotations Nigeria | AB Technologies",
         description:
-            "Request structured technology procurement quotations for hardware, infrastructure and business IT requirements.",
+            "Request structured technology procurement quotations for computers, servers, networking equipment, infrastructure and other business IT requirements.",
     },
 
     "/procurement/logistics": {
-        title: "Technology Procurement Logistics | AB Technologies",
+        title:
+            "Technology Procurement & Logistics Nigeria | AB Technologies",
         description:
-            "Coordinate technology sourcing, procurement and logistics with AB Technologies for business and institutional deployments.",
+            "AB Technologies coordinates technology sourcing, procurement and logistics for business and institutional IT deployments.",
     },
 
     // ============================================================
@@ -117,51 +141,59 @@ const SEO_ROUTES = {
     // ============================================================
 
     "/solutions/software": {
-        title: "Business Software Solutions | AB Technologies",
+        title:
+            "Business Software Solutions Nigeria | AB Technologies",
         description:
-            "Custom business software, web platforms and digital systems built to improve operations and support organizational growth.",
+            "AB Technologies builds custom business software, web platforms and digital systems designed to improve operations, productivity and organizational growth.",
     },
 
     "/solutions/cloud-infrastructure": {
-        title: "Cloud Infrastructure Solutions | AB Technologies",
+        title:
+            "Cloud Infrastructure Solutions Nigeria | AB Technologies",
         description:
             "Build scalable cloud infrastructure, hosting environments and modern IT systems with AB Technologies.",
     },
 
     "/solutions/ai": {
-        title: "Artificial Intelligence Solutions | AB Technologies",
+        title:
+            "Artificial Intelligence Solutions Nigeria | AB Technologies",
         description:
-            "Practical AI solutions for business automation, intelligent workflows, digital assistants and modern technology operations.",
+            "AB Technologies delivers practical AI solutions including intelligent automation, digital assistants, workflow automation and AI-powered business systems.",
     },
 
     "/solutions/communications": {
-        title: "Business Communication Solutions | AB Technologies",
+        title:
+            "Business Communication Solutions Nigeria | AB Technologies",
         description:
-            "Modern communication technology and infrastructure solutions for businesses, institutions and distributed teams.",
+            "Modern business communication technology and connectivity infrastructure for companies, institutions and distributed teams.",
     },
 
     "/solutions/business-systems": {
-        title: "Business Systems & Digital Platforms | AB Technologies",
+        title:
+            "Business Systems & Digital Platforms | AB Technologies",
         description:
-            "AB Technologies develops integrated business systems and digital platforms that simplify operations and improve productivity.",
+            "AB Technologies develops integrated business systems and digital platforms that simplify operations, connect workflows and improve productivity.",
     },
 
     "/solutions/automation": {
-        title: "Business Process Automation | AB Technologies",
+        title:
+            "Business Process Automation Nigeria | AB Technologies",
         description:
-            "Automate repetitive workflows and connect business processes with intelligent technology solutions from AB Technologies.",
+            "Automate repetitive business processes, connect workflows and improve operational efficiency with intelligent automation solutions from AB Technologies.",
     },
 
     "/solutions/security": {
-        title: "Cybersecurity & Technology Security | AB Technologies",
+        title:
+            "Cybersecurity Solutions in Nigeria | AB Technologies",
         description:
-            "Protect business systems, infrastructure and digital operations with practical cybersecurity and technology security solutions.",
+            "Protect business systems, networks, infrastructure and digital operations with practical cybersecurity and technology security solutions.",
     },
 
     "/solutions/managed-it": {
-        title: "Managed IT Services | AB Technologies",
+        title:
+            "Managed IT Services in Nigeria | AB Technologies",
         description:
-            "Reliable managed IT services, technology administration and technical support for growing businesses and organizations.",
+            "AB Technologies provides managed IT services, technology administration, infrastructure management and technical support for growing organizations.",
     },
 
     // ============================================================
@@ -169,51 +201,59 @@ const SEO_ROUTES = {
     // ============================================================
 
     "/industries/business": {
-        title: "Technology Solutions for Businesses | AB Technologies",
+        title:
+            "Business Technology Solutions Nigeria | AB Technologies",
         description:
-            "Software, infrastructure, procurement, cloud and managed technology solutions designed for modern businesses.",
+            "Software, IT infrastructure, procurement, cloud and managed technology solutions designed for businesses operating in Nigeria.",
     },
 
     "/industries/healthcare": {
-        title: "Healthcare Technology Solutions | AB Technologies",
+        title:
+            "Healthcare Technology Solutions Nigeria | AB Technologies",
         description:
-            "Technology infrastructure, software and IT solutions designed to support healthcare organizations and operations.",
+            "Technology infrastructure, software, procurement and IT solutions designed to support healthcare organizations and modern healthcare operations.",
     },
 
     "/industries/government": {
-        title: "Government Technology Solutions | AB Technologies",
+        title:
+            "Government Technology Solutions Nigeria | AB Technologies",
         description:
-            "Technology procurement, infrastructure and digital solutions for government agencies and public-sector organizations.",
+            "Technology procurement, infrastructure and digital solutions designed for government agencies and public-sector organizations.",
     },
 
     "/industries/retail": {
-        title: "Retail Technology Solutions | AB Technologies",
+        title:
+            "Retail Technology Solutions Nigeria | AB Technologies",
         description:
-            "Digital systems, infrastructure and technology solutions that help retail businesses operate efficiently and scale.",
+            "Digital systems, infrastructure, business software and technology solutions that help retail organizations operate efficiently and scale.",
     },
 
     "/industries/education": {
-        title: "Education Technology Solutions | AB Technologies",
+        title:
+            "Education Technology Solutions Nigeria | AB Technologies",
         description:
-            "Software, IT infrastructure, procurement and digital technology solutions for schools and educational institutions.",
+            "Software, IT infrastructure, hardware procurement and digital technology solutions for schools, universities and educational institutions.",
     },
 
     "/industries/manufacturing": {
-        title: "Manufacturing Technology Solutions | AB Technologies",
+        title:
+            "Manufacturing Technology Solutions | AB Technologies",
         description:
-            "Technology infrastructure, automation and digital systems for modern manufacturing businesses and operations.",
+            "Technology infrastructure, automation, software and digital systems designed for modern manufacturing businesses and industrial operations.",
     },
 
     "/industries/ngos": {
-        title: "Technology Solutions for NGOs | AB Technologies",
+        title:
+            "Technology Solutions for NGOs Nigeria | AB Technologies",
         description:
-            "Practical software, procurement, cloud and IT solutions for NGOs and nonprofit organizations.",
+            "Practical software, procurement, cloud infrastructure and IT solutions designed for NGOs, nonprofits and development organizations.",
     },
 
     "/industries/startups": {
-        title: "Technology Solutions for Startups | AB Technologies",
+        title:
+            "Technology Solutions for Startups Nigeria | AB Technologies",
         description:
-            "Scalable software, cloud, infrastructure and technology services designed for startups and growing companies.",
+            "Scalable software, cloud infrastructure, IT procurement and technology services designed for startups and growing companies.",
     },
 
     // ============================================================
@@ -221,33 +261,38 @@ const SEO_ROUTES = {
     // ============================================================
 
     "/about/who-we-are": {
-        title: "About AB Technologies | Who We Are",
+        title:
+            "About AB Technologies Nigeria | Who We Are",
         description:
-            "Learn about AB Technologies and our approach to IT procurement, software, infrastructure, cloud, AI and technology services.",
+            "Learn about AB Technologies, a Nigeria-based technology company providing IT procurement, software development, infrastructure, cloud, security, AI and managed technology services.",
     },
 
     "/about/why-choose-us": {
-        title: "Why Choose AB Technologies",
+        title:
+            "Why Choose AB Technologies Nigeria",
         description:
-            "Discover how AB Technologies combines technology expertise, procurement capabilities and practical digital solutions for organizations.",
+            "Discover how AB Technologies combines technology expertise, procurement capabilities, software development and practical digital solutions for organizations.",
     },
 
     "/about/capabilities": {
-        title: "Our Technology Capabilities | AB Technologies",
+        title:
+            "Technology Capabilities | AB Technologies Nigeria",
         description:
-            "Explore AB Technologies' capabilities across software, hardware procurement, networking, cloud, security, AI and managed IT.",
+            "Explore AB Technologies capabilities across software development, IT hardware procurement, networking, cloud, cybersecurity, AI automation and managed IT.",
     },
 
     "/about/partners": {
-        title: "Technology Partners | AB Technologies",
+        title:
+            "Technology Partners & Suppliers | AB Technologies",
         description:
-            "Learn about AB Technologies' technology ecosystem, supplier relationships and approach to delivering reliable solutions.",
+            "Learn about AB Technologies' technology ecosystem, supplier relationships and approach to sourcing and delivering reliable technology solutions.",
     },
 
     "/about/approach": {
-        title: "Our Approach | AB Technologies",
+        title:
+            "Our Technology Approach | AB Technologies Nigeria",
         description:
-            "See how AB Technologies plans, sources, builds, deploys and supports technology solutions for businesses and organizations.",
+            "See how AB Technologies plans, sources, develops, deploys and supports technology solutions for businesses and organizations.",
     },
 
     // ============================================================
@@ -255,45 +300,52 @@ const SEO_ROUTES = {
     // ============================================================
 
     "/resources/buying-guides": {
-        title: "Technology Buying Guides | AB Technologies",
+        title:
+            "Technology Buying Guides Nigeria | AB Technologies",
         description:
-            "Practical guides for evaluating and purchasing business hardware, infrastructure and technology solutions.",
+            "Practical technology buying guides for evaluating computers, hardware, networking equipment, infrastructure and business technology solutions.",
     },
 
     "/resources/procurement-guides": {
-        title: "IT Procurement Guides | AB Technologies",
+        title:
+            "IT Procurement Guides Nigeria | AB Technologies",
         description:
-            "Learn how to plan technology procurement, evaluate suppliers and make informed IT purchasing decisions.",
+            "Learn how to plan technology procurement, evaluate suppliers, compare equipment and make informed IT purchasing decisions.",
     },
 
     "/resources/case-studies": {
-        title: "Technology Case Studies | AB Technologies",
+        title:
+            "Technology Case Studies | AB Technologies",
         description:
-            "Explore technology projects, implementation approaches and business solutions from AB Technologies.",
+            "Explore technology projects, implementation approaches, procurement solutions and digital systems delivered by AB Technologies.",
     },
 
     "/resources/technology-insights": {
-        title: "Technology Insights | AB Technologies",
+        title:
+            "Technology Insights Nigeria | AB Technologies",
         description:
-            "Insights on software, IT procurement, infrastructure, cloud computing, cybersecurity, AI and business technology.",
+            "Insights from AB Technologies covering software, IT procurement, infrastructure, cloud computing, cybersecurity, AI and business technology.",
     },
 
     "/resources/faqs": {
-        title: "Technology FAQs | AB Technologies",
+        title:
+            "Technology & IT Services FAQs | AB Technologies",
         description:
-            "Answers to common questions about AB Technologies, IT procurement, software development, cloud, infrastructure and technology services.",
+            "Answers to common questions about AB Technologies, IT procurement, software development, cloud infrastructure, networking, AI and managed IT services.",
     },
 
     "/resources/blog": {
-        title: "Technology Blog | AB Technologies",
+        title:
+            "Technology Blog Nigeria | AB Technologies",
         description:
-            "Articles and insights covering business technology, software, IT procurement, cloud, cybersecurity and artificial intelligence.",
+            "Articles and insights covering business technology, software development, IT procurement, cloud computing, cybersecurity, automation and artificial intelligence.",
     },
 
     "/resources/learning": {
-        title: "Technology Learning Resources | AB Technologies",
+        title:
+            "Technology Learning Resources | AB Technologies",
         description:
-            "Practical technology learning resources covering software, infrastructure, cloud, AI and modern digital skills.",
+            "Practical learning resources covering software development, IT infrastructure, cloud computing, artificial intelligence and modern digital skills.",
     },
 
     // ============================================================
@@ -301,27 +353,43 @@ const SEO_ROUTES = {
     // ============================================================
 
     "/contact": {
-        title: "Contact AB Technologies | Discuss Your Technology Needs",
+        title:
+            "Contact AB Technologies Nigeria | Technology Solutions",
         description:
-            "Contact AB Technologies to discuss IT procurement, software development, networking, cloud, AI automation and other technology requirements.",
+            "Contact AB Technologies to discuss IT procurement, software development, networking, cloud infrastructure, cybersecurity, AI automation and other technology requirements.",
     },
 
     "/support": {
-        title: "Technology Support | AB Technologies",
+        title:
+            "Technology Support Nigeria | AB Technologies",
         description:
-            "Get technology support and assistance from AB Technologies for your systems, services and technology solutions.",
+            "Get technical assistance and technology support from AB Technologies for your IT systems, infrastructure, software and technology services.",
     },
 
     "/support/ai": {
-        title: "AB AI Technology Assistant | AB Technologies",
+        title:
+            "AB AI Technology Assistant | AB Technologies",
         description:
-            "Talk with AB AI to explore AB Technologies services, technology requirements, procurement and project solutions.",
+            "Talk with AB AI to explore AB Technologies services, technology requirements, procurement options, software projects and business technology solutions.",
     },
 };
 
-// ============================================================
-// META HELPERS
-// ============================================================
+/* ============================================================
+   PRIVATE / NON-INDEXABLE ROUTES
+   ============================================================ */
+
+const PRIVATE_PREFIXES = [
+    "/portal",
+    "/staff",
+    "/payment",
+    "/payments",
+    "/proposals",
+    "/track-procurement",
+];
+
+/* ============================================================
+   META HELPERS
+   ============================================================ */
 
 function setMeta(selector, attribute, value) {
     let element = document.head.querySelector(selector);
@@ -331,11 +399,13 @@ function setMeta(selector, attribute, value) {
 
         if (selector.includes("property=")) {
             const match = selector.match(/property="([^"]+)"/);
+
             if (match) {
                 element.setAttribute("property", match[1]);
             }
         } else {
             const match = selector.match(/name="([^"]+)"/);
+
             if (match) {
                 element.setAttribute("name", match[1]);
             }
@@ -348,7 +418,9 @@ function setMeta(selector, attribute, value) {
 }
 
 function setCanonical(url) {
-    let canonical = document.head.querySelector('link[rel="canonical"]');
+    let canonical = document.head.querySelector(
+        'link[rel="canonical"]'
+    );
 
     if (!canonical) {
         canonical = document.createElement("link");
@@ -359,57 +431,183 @@ function setCanonical(url) {
     canonical.setAttribute("href", url);
 }
 
-// ============================================================
-// COMPONENT
-// ============================================================
+/* ============================================================
+   STRUCTURED DATA
+   ============================================================ */
+
+function setStructuredData(id, data) {
+    let script = document.head.querySelector(`#${id}`);
+
+    if (!script) {
+        script = document.createElement("script");
+        script.id = id;
+        script.type = "application/ld+json";
+        document.head.appendChild(script);
+    }
+
+    script.textContent = JSON.stringify(data);
+}
+
+function removeStructuredData(id) {
+    const script = document.head.querySelector(`#${id}`);
+
+    if (script) {
+        script.remove();
+    }
+}
+
+/* ============================================================
+   ORGANIZATION SCHEMA
+   ============================================================ */
+
+const ORGANIZATION_SCHEMA = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+
+    name: "AB Technologies",
+
+    url: SITE_URL,
+
+    logo: `${SITE_URL}/favicon-192x192.png`,
+
+    image: DEFAULT_IMAGE,
+
+    description:
+        "AB Technologies is a Nigeria-based technology company providing IT procurement, software development, networking, cloud infrastructure, cybersecurity, AI automation and managed technology services.",
+
+    areaServed: {
+        "@type": "Country",
+        name: "Nigeria",
+    },
+
+    knowsAbout: [
+        "Information Technology",
+        "IT Hardware Procurement",
+        "Software Development",
+        "Artificial Intelligence",
+        "Business Automation",
+        "Cloud Computing",
+        "Cybersecurity",
+        "Computer Networking",
+        "Managed IT Services",
+        "Technology Procurement",
+    ],
+};
+
+/* ============================================================
+   WEBSITE SCHEMA
+   ============================================================ */
+
+const WEBSITE_SCHEMA = {
+    "@context": "https://schema.org",
+
+    "@type": "WebSite",
+
+    name: SITE_NAME,
+
+    alternateName: [
+        "AB Technologies Nigeria",
+        "AB Technology",
+    ],
+
+    url: `${SITE_URL}/`,
+
+    publisher: {
+        "@type": "Organization",
+        name: SITE_NAME,
+        url: SITE_URL,
+    },
+};
+
+/* ============================================================
+   ROUTE SEO COMPONENT
+   ============================================================ */
 
 export default function RouteSEO() {
     const location = useLocation();
 
     useEffect(() => {
+        /* ------------------------------------------------------------
+           NORMALIZE PATH
+           ------------------------------------------------------------ */
+
         const pathname =
             location.pathname === "/"
                 ? "/"
                 : location.pathname.replace(/\/+$/, "");
 
+        /* ------------------------------------------------------------
+           DETERMINE ROUTE TYPE
+           ------------------------------------------------------------ */
+
         const seo = SEO_ROUTES[pathname];
 
-        // ----------------------------------------------------------
-        // PRIVATE / TRANSACTIONAL ROUTES
-        // ----------------------------------------------------------
+        const isPrivatePrefix = PRIVATE_PREFIXES.some(
+            (prefix) =>
+                pathname === prefix ||
+                pathname.startsWith(`${prefix}/`)
+        );
 
-        const privatePrefixes = [
-            "/portal",
-            "/staff",
-            "/payment",
-            "/payments",
-            "/proposals",
-            "/track-procurement",
-        ];
+        /*
+         * Public procurement pages exist inside SEO_ROUTES.
+         *
+         * Any /procurement/... route that IS NOT explicitly defined
+         * inside SEO_ROUTES is treated as a dynamic/private procurement
+         * page.
+         *
+         * Examples:
+         *
+         * /procurement/hardware
+         *      => PUBLIC
+         *
+         * /procurement/international
+         *      => PUBLIC
+         *
+         * /procurement/ABC123PRIVATE-TOKEN
+         *      => PRIVATE
+         */
+
+        const isDynamicProcurement =
+            pathname.startsWith("/procurement/") &&
+            !SEO_ROUTES[pathname];
 
         const isPrivate =
-            privatePrefixes.some(
-                (prefix) =>
-                    pathname === prefix ||
-                    pathname.startsWith(`${prefix}/`)
-            ) ||
-            /^\/procurement\/[^/]+$/.test(pathname);
+            isPrivatePrefix || isDynamicProcurement;
+
+        /* ------------------------------------------------------------
+           PRIVATE / TRANSACTIONAL ROUTES
+           ------------------------------------------------------------ */
 
         if (isPrivate) {
-            document.title = "AB Technologies";
+            document.title = SITE_NAME;
 
             setMeta(
                 'meta[name="robots"]',
                 "content",
-                "noindex, nofollow"
+                "noindex, nofollow, noarchive"
             );
+
+            setMeta(
+                'meta[name="googlebot"]',
+                "content",
+                "noindex, nofollow, noarchive"
+            );
+
+            /*
+             * Remove public-page structured data from private pages
+             * when navigating inside the SPA.
+             */
+
+            removeStructuredData("ab-organization-schema");
+            removeStructuredData("ab-website-schema");
+            removeStructuredData("ab-webpage-schema");
 
             return;
         }
 
-        // ----------------------------------------------------------
-        // PUBLIC ROUTE
-        // ----------------------------------------------------------
+        /* ------------------------------------------------------------
+           PUBLIC ROUTE
+           ------------------------------------------------------------ */
 
         const data = seo || DEFAULT_SEO;
 
@@ -418,7 +616,15 @@ export default function RouteSEO() {
                 ? `${SITE_URL}/`
                 : `${SITE_URL}${pathname}`;
 
+        /* ------------------------------------------------------------
+           TITLE
+           ------------------------------------------------------------ */
+
         document.title = data.title;
+
+        /* ------------------------------------------------------------
+           STANDARD META
+           ------------------------------------------------------------ */
 
         setMeta(
             'meta[name="description"]',
@@ -429,12 +635,25 @@ export default function RouteSEO() {
         setMeta(
             'meta[name="robots"]',
             "content",
-            "index, follow, max-image-preview:large"
+            "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
         );
+
+        setMeta(
+            'meta[name="googlebot"]',
+            "content",
+            "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+        );
+
+        /* ------------------------------------------------------------
+           CANONICAL
+           ------------------------------------------------------------ */
 
         setCanonical(canonical);
 
-        // Open Graph
+        /* ------------------------------------------------------------
+           OPEN GRAPH
+           ------------------------------------------------------------ */
+
         setMeta(
             'meta[property="og:title"]',
             "content",
@@ -460,12 +679,39 @@ export default function RouteSEO() {
         );
 
         setMeta(
+            'meta[property="og:site_name"]',
+            "content",
+            SITE_NAME
+        );
+
+        setMeta(
             'meta[property="og:image"]',
             "content",
             DEFAULT_IMAGE
         );
 
-        // Twitter / X
+        setMeta(
+            'meta[property="og:image:alt"]',
+            "content",
+            "AB Technologies - Technology Solutions"
+        );
+
+        setMeta(
+            'meta[property="og:locale"]',
+            "content",
+            "en_NG"
+        );
+
+        /* ------------------------------------------------------------
+           TWITTER / X
+           ------------------------------------------------------------ */
+
+        setMeta(
+            'meta[name="twitter:card"]',
+            "content",
+            "summary_large_image"
+        );
+
         setMeta(
             'meta[name="twitter:title"]',
             "content",
@@ -483,6 +729,69 @@ export default function RouteSEO() {
             "content",
             DEFAULT_IMAGE
         );
+
+        setMeta(
+            'meta[name="twitter:image:alt"]',
+            "content",
+            "AB Technologies - Technology Solutions"
+        );
+
+        /* ------------------------------------------------------------
+           ORGANIZATION STRUCTURED DATA
+           ------------------------------------------------------------ */
+
+        setStructuredData(
+            "ab-organization-schema",
+            ORGANIZATION_SCHEMA
+        );
+
+        /* ------------------------------------------------------------
+           WEBSITE STRUCTURED DATA
+           ------------------------------------------------------------ */
+
+        setStructuredData(
+            "ab-website-schema",
+            WEBSITE_SCHEMA
+        );
+
+        /* ------------------------------------------------------------
+           PAGE-SPECIFIC STRUCTURED DATA
+           ------------------------------------------------------------ */
+
+        const webpageSchema = {
+            "@context": "https://schema.org",
+
+            "@type":
+                pathname === "/"
+                    ? "WebPage"
+                    : "WebPage",
+
+            name: data.title,
+
+            description: data.description,
+
+            url: canonical,
+
+            isPartOf: {
+                "@type": "WebSite",
+                name: SITE_NAME,
+                url: `${SITE_URL}/`,
+            },
+
+            about: {
+                "@type": "Organization",
+                name: SITE_NAME,
+                url: SITE_URL,
+            },
+
+            inLanguage: "en-NG",
+        };
+
+        setStructuredData(
+            "ab-webpage-schema",
+            webpageSchema
+        );
+
     }, [location.pathname]);
 
     return null;
