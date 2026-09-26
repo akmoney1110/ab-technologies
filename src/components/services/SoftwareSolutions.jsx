@@ -66,7 +66,7 @@ import { queueSupportRequest } from "../AI";
             "@type": "Organization",
             "name": "AB Technologies"
         },
-        "url": "https://abtechnologies.com/services/software-solutions",
+        "url": "https://abtechbridge.com/services/software-solutions",
         "description": "Custom software development, web applications, business systems and enterprise technology solutions."
     }}
 />

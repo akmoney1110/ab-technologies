@@ -67,7 +67,7 @@ const SUPPORT_SOURCE = "Hardware & Device Procurement";
             "@type": "Organization",
             "name": "AB Technologies"
         },
-        "url": "https://abtechnologies.com/services/hardware-procurement",
+        "url": "https://abtechbridge.com/services/hardware-procurement",
         "description": "IT hardware procurement, technology sourcing, equipment supply and deployment services."
     }}
 />
