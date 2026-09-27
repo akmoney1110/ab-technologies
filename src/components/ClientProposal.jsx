@@ -1,10 +1,31 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
-    ArrowRight, BriefcaseBusiness, CalendarDays, Check, CheckCircle2,
-    ChevronDown, ChevronUp, CircleDollarSign, Clock3, Cpu, FileCheck2,
-    FileText, Globe2, Layers3, Loader2, Mail, Minus, PackageCheck, Plus,
-    RefreshCw, Save, ShieldCheck, Sparkles, Trash2, UserRound, X, XCircle
+    ArrowRight,
+    BriefcaseBusiness,
+    CalendarDays,
+    Check,
+    CheckCircle2,
+    CircleDollarSign,
+    Clock3,
+    Cpu,
+    FileCheck2,
+    FileText,
+    Globe2,
+    Layers3,
+    Loader2,
+    Mail,
+    Minus,
+    PackageCheck,
+    Plus,
+    RefreshCw,
+    Save,
+    ShieldCheck,
+    Sparkles,
+    Trash2,
+    UserRound,
+    X,
+    XCircle,
 } from "lucide-react";
 
 const API_URL = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
@@ -12,9 +33,16 @@ const API_URL = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
 const endpoint = (path) => `${API_URL}${path}`;
 
 const money = (value, currency = "NGN") => {
-    if (value === null || value === undefined || value === "") return "—";
+    if (value === null || value === undefined || value === "") {
+        return "—";
+    }
+
     const n = Number(value);
-    if (!Number.isFinite(n)) return String(value);
+
+    if (!Number.isFinite(n)) {
+        return String(value);
+    }
+
     try {
         return new Intl.NumberFormat("en-NG", {
             style: "currency",
@@ -31,12 +59,17 @@ const money = (value, currency = "NGN") => {
 
 const dateText = (value) => {
     if (!value) return "—";
+
     const d = new Date(value);
-    if (Number.isNaN(d.getTime())) return String(value);
+
+    if (Number.isNaN(d.getTime())) {
+        return String(value);
+    }
+
     return d.toLocaleDateString(undefined, {
         year: "numeric",
         month: "long",
-        day: "numeric"
+        day: "numeric",
     });
 };
 
@@ -46,23 +79,43 @@ const titleize = (value = "") =>
         .replace(/\b\w/g, (c) => c.toUpperCase());
 
 const hasValue = (value) => {
-    if (value === null || value === undefined || value === "") return false;
-    if (Array.isArray(value)) return value.length > 0;
-    if (typeof value === "object") return Object.keys(value).length > 0;
+    if (value === null || value === undefined || value === "") {
+        return false;
+    }
+
+    if (Array.isArray(value)) {
+        return value.length > 0;
+    }
+
+    if (typeof value === "object") {
+        return Object.keys(value).length > 0;
+    }
+
     return true;
 };
 
 const apiError = (data, fallback) =>
-    data?.error || data?.detail || data?.message || fallback;
+    data?.error ||
+    data?.detail ||
+    data?.message ||
+    fallback;
 
 function SmartValue({ value, depth = 0 }) {
-    if (!hasValue(value)) return null;
+    if (!hasValue(value)) {
+        return null;
+    }
 
-    if (["string", "number", "boolean"].includes(typeof value)) {
+    if (
+        typeof value === "string" ||
+        typeof value === "number" ||
+        typeof value === "boolean"
+    ) {
         return (
             <div className="text-sm leading-7 text-slate-600">
                 {typeof value === "boolean"
-                    ? (value ? "Yes" : "No")
+                    ? value
+                        ? "Yes"
+                        : "No"
                     : String(value)}
             </div>
         );
@@ -71,12 +124,13 @@ function SmartValue({ value, depth = 0 }) {
     if (Array.isArray(value)) {
         return (
             <div className="grid gap-2.5">
-                {value.map((item, i) => (
+                {value.map((item, index) => (
                     <div
-                        key={i}
+                        key={index}
                         className="flex gap-3 rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3"
                     >
                         <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-600" />
+
                         <div className="min-w-0 flex-1">
                             <SmartValue
                                 value={item}
@@ -90,10 +144,16 @@ function SmartValue({ value, depth = 0 }) {
     }
 
     return (
-        <div className={depth ? "grid gap-2" : "grid gap-3 sm:grid-cols-2"}>
+        <div
+            className={
+                depth
+                    ? "grid gap-2"
+                    : "grid gap-3 sm:grid-cols-2"
+            }
+        >
             {Object.entries(value)
-                .filter(([, v]) => hasValue(v))
-                .map(([key, v]) => (
+                .filter(([, itemValue]) => hasValue(itemValue))
+                .map(([key, itemValue]) => (
                     <div
                         key={key}
                         className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4"
@@ -103,7 +163,7 @@ function SmartValue({ value, depth = 0 }) {
                         </div>
 
                         <SmartValue
-                            value={v}
+                            value={itemValue}
                             depth={depth + 1}
                         />
                     </div>
@@ -119,7 +179,7 @@ function Section({
     title,
     description,
     children,
-    className = ""
+    className = "",
 }) {
     return (
         <section
@@ -170,59 +230,75 @@ function Badge({ children, tone = "slate" }) {
 
     return (
         <span
-            className={`inline-flex items-center rounded-full border px-2.5 py-1 text-[10px] font-black uppercase tracking-wider ${tones[tone]}`}
+            className={`inline-flex items-center rounded-full border px-2.5 py-1 text-[10px] font-black uppercase tracking-wider ${tones[tone] || tones.slate
+                }`}
         >
             {children}
         </span>
     );
 }
 
+/*
+ * PROJECT FEATURE CARD
+ *
+ * IMPORTANT:
+ * Individual feature pricing is intentionally NOT displayed here.
+ *
+ * Project/software proposals show the overall Current Investment only.
+ * Procurement quotations have their own itemized pricing section below.
+ */
 function FeatureCard({
     feature,
     kind,
     editable,
     busy,
     onToggle,
-    currency
 }) {
+    const badgeTone =
+        kind === "required"
+            ? "green"
+            : kind === "recommended"
+                ? "blue"
+                : "slate";
+
+    const badgeText =
+        kind === "required"
+            ? "Required · Included"
+            : kind === "recommended"
+                ? "Recommended · Included"
+                : "Optional · Not Included";
+
+    const buttonText =
+        kind === "optional"
+            ? "Add to Proposal"
+            : kind === "required"
+                ? "Remove from Required"
+                : "Move to Optional";
+
     return (
         <div className="group rounded-3xl border border-slate-200 bg-white p-5 transition hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-xl hover:shadow-slate-200/50">
-            <div className="flex flex-col justify-between gap-4 sm:flex-row">
-                <div className="min-w-0">
-                    <div className="mb-2 flex flex-wrap items-center gap-2">
-                        <Badge
-                            tone={
-                                kind === "required"
-                                    ? "green"
-                                    : kind === "recommended"
-                                        ? "blue"
-                                        : "slate"
-                            }
-                        >
-                            {kind === "required"
-                                ? "Required · Included"
-                                : kind === "recommended"
-                                    ? "Recommended · Included"
-                                    : "Optional · Not Included"}
+            <div className="min-w-0">
+                <div className="mb-2 flex flex-wrap items-center gap-2">
+                    <Badge tone={badgeTone}>
+                        {badgeText}
+                    </Badge>
+
+                    {feature.category && (
+                        <Badge>
+                            {titleize(feature.category)}
                         </Badge>
-
-                        {feature.category && (
-                            <Badge>
-                                {titleize(feature.category)}
-                            </Badge>
-                        )}
-                    </div>
-
-                    <h3 className="text-base font-black text-slate-950 sm:text-lg">
-                        {feature.name}
-                    </h3>
-
-                    {feature.description && (
-                        <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-500">
-                            {feature.description}
-                        </p>
                     )}
                 </div>
+
+                <h3 className="text-base font-black text-slate-950 sm:text-lg">
+                    {feature.name}
+                </h3>
+
+                {feature.description && (
+                    <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-500">
+                        {feature.description}
+                    </p>
+                )}
             </div>
 
             {editable && (
@@ -246,11 +322,7 @@ function FeatureCard({
                         <Minus size={16} />
                     )}
 
-                    {kind === "optional"
-                        ? "Add to Proposal"
-                        : kind === "required"
-                            ? "Remove from Required"
-                            : "Move to Optional"}
+                    {buttonText}
                 </button>
             )}
         </div>
@@ -262,9 +334,11 @@ function Modal({
     title,
     description,
     children,
-    onClose
+    onClose,
 }) {
-    if (!open) return null;
+    if (!open) {
+        return null;
+    }
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/65 p-4 backdrop-blur-sm">
@@ -283,8 +357,10 @@ function Modal({
                     </div>
 
                     <button
+                        type="button"
                         onClick={onClose}
-                        className="rounded-xl p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+                        className="rounded-xl p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+                        aria-label="Close"
                     >
                         <X size={20} />
                     </button>
@@ -302,6 +378,7 @@ export default function ClientProposal() {
     const { publicToken } = useParams();
 
     const [proposal, setProposal] = useState(null);
+
     const [quoteDraft, setQuoteDraft] = useState([]);
     const [quotePreview, setQuotePreview] = useState(null);
     const [quoteDirty, setQuoteDirty] = useState(false);
@@ -313,6 +390,7 @@ export default function ClientProposal() {
 
     const [acceptOpen, setAcceptOpen] = useState(false);
     const [declineOpen, setDeclineOpen] = useState(false);
+
     const [acceptComment, setAcceptComment] = useState("");
     const [declineComment, setDeclineComment] = useState("");
 
@@ -321,76 +399,100 @@ export default function ClientProposal() {
         proposal?.quotation?.currency ||
         "NGN";
 
-    const fetchProposal = useCallback(async ({ quiet = false } = {}) => {
-        if (!publicToken) return;
-
-        if (!quiet) setLoading(true);
-
-        setError("");
-
-        try {
-            const response = await fetch(
-                endpoint(`/api/proposals/client/${publicToken}/`),
-                {
-                    method: "GET",
-                    headers: {
-                        Accept: "application/json"
-                    },
-                    credentials: "same-origin",
-                }
-            );
-
-            const data = await response.json().catch(() => null);
-
-            if (
-                !response.ok ||
-                !data?.success ||
-                !data?.proposal
-            ) {
-                throw new Error(
-                    apiError(
-                        data,
-                        "Unable to load this proposal."
-                    )
-                );
+    const fetchProposal = useCallback(
+        async ({ quiet = false } = {}) => {
+            if (!publicToken) {
+                return;
             }
 
-            const p = data.proposal;
+            if (!quiet) {
+                setLoading(true);
+            }
 
-            setProposal(p);
+            setError("");
 
-            const items = Array.isArray(p?.quotation?.items)
-                ? p.quotation.items
-                : [];
+            try {
+                const response = await fetch(
+                    endpoint(
+                        `/api/proposals/client/${publicToken}/`
+                    ),
+                    {
+                        method: "GET",
+                        headers: {
+                            Accept: "application/json",
+                        },
+                        credentials: "same-origin",
+                    }
+                );
 
-            setQuoteDraft(
-                items.map((item) => ({
-                    ...item,
-                    quantity: Number(item.quantity || 0),
-                    included: Number(item.quantity || 0) > 0,
-                }))
-            );
+                const data = await response
+                    .json()
+                    .catch(() => null);
 
-            setQuotePreview(p.quotation || null);
-            setQuoteDirty(false);
+                if (
+                    !response.ok ||
+                    !data?.success ||
+                    !data?.proposal
+                ) {
+                    throw new Error(
+                        apiError(
+                            data,
+                            "Unable to load this proposal."
+                        )
+                    );
+                }
 
-        } catch (e) {
-            setError(
-                e.message ||
-                "Unable to load this proposal."
-            );
-        } finally {
-            if (!quiet) setLoading(false);
-        }
-    }, [publicToken]);
+                const loadedProposal = data.proposal;
+
+                setProposal(loadedProposal);
+
+                const items = Array.isArray(
+                    loadedProposal?.quotation?.items
+                )
+                    ? loadedProposal.quotation.items
+                    : [];
+
+                setQuoteDraft(
+                    items.map((item) => ({
+                        ...item,
+                        quantity: Number(item.quantity || 0),
+                        included:
+                            Number(item.quantity || 0) > 0,
+                    }))
+                );
+
+                setQuotePreview(
+                    loadedProposal.quotation || null
+                );
+
+                setQuoteDirty(false);
+            } catch (e) {
+                setError(
+                    e?.message ||
+                    "Unable to load this proposal."
+                );
+            } finally {
+                if (!quiet) {
+                    setLoading(false);
+                }
+            }
+        },
+        [publicToken]
+    );
 
     useEffect(() => {
         fetchProposal();
     }, [fetchProposal]);
 
-    // Current Investment should follow the live quotation while the client
-    // is editing a procurement proposal. After Save Quotation, the backend
-    // remains the source of truth and proposal.total_price is synchronized.
+    /*
+     * For procurement quotations, Current Investment follows
+     * the live quotation preview.
+     *
+     * For ordinary software/project proposals, it uses the
+     * proposal's overall total.
+     *
+     * Individual project feature prices are not displayed.
+     */
     const currentInvestment = useMemo(() => {
         if (proposal?.quotation) {
             if (quotePreview?.formatted_total) {
@@ -407,13 +509,13 @@ export default function ClientProposal() {
                 );
             }
 
-            if (proposal.quotation?.formatted_total) {
+            if (proposal.quotation.formatted_total) {
                 return proposal.quotation.formatted_total;
             }
 
             if (
-                proposal.quotation?.total !== null &&
-                proposal.quotation?.total !== undefined
+                proposal.quotation.total !== null &&
+                proposal.quotation.total !== undefined
             ) {
                 return money(
                     proposal.quotation.total,
@@ -446,21 +548,8 @@ export default function ClientProposal() {
             "rejected",
             "expired",
             "cancelled",
-            "completed"
+            "completed",
         ].includes(proposal?.status);
-
-    const updateDraft = (id, patch) => {
-        setQuoteDraft((items) =>
-            items.map((item) =>
-                item.id === id
-                    ? { ...item, ...patch }
-                    : item
-            )
-        );
-
-        setQuoteDirty(true);
-        setNotice("");
-    };
 
     const quotationPayload = () => ({
         items: quoteDraft.map((item) => ({
@@ -475,8 +564,12 @@ export default function ClientProposal() {
         })),
     });
 
-    const previewQuotation = async (draft = quoteDraft) => {
-        if (!proposal?.quotation) return;
+    const previewQuotation = async (
+        draft = quoteDraft
+    ) => {
+        if (!proposal?.quotation) {
+            return;
+        }
 
         setAction("preview");
         setError("");
@@ -490,7 +583,7 @@ export default function ClientProposal() {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
-                        Accept: "application/json"
+                        Accept: "application/json",
                     },
                     credentials: "same-origin",
                     body: JSON.stringify({
@@ -499,16 +592,22 @@ export default function ClientProposal() {
                             quantity: item.included
                                 ? Math.max(
                                     1,
-                                    Number(item.quantity || 1)
+                                    Number(
+                                        item.quantity || 1
+                                    )
                                 )
                                 : 0,
-                            included: Boolean(item.included),
+                            included: Boolean(
+                                item.included
+                            ),
                         })),
                     }),
                 }
             );
 
-            const data = await response.json().catch(() => null);
+            const data = await response
+                .json()
+                .catch(() => null);
 
             if (!response.ok || !data?.success) {
                 throw new Error(
@@ -520,10 +619,9 @@ export default function ClientProposal() {
             }
 
             setQuotePreview(data.quotation);
-
         } catch (e) {
             setError(
-                e.message ||
+                e?.message ||
                 "Unable to recalculate quotation."
             );
         } finally {
@@ -532,19 +630,20 @@ export default function ClientProposal() {
     };
 
     const changeQuantity = (item, delta) => {
-        const next = Math.max(
+        const nextQuantity = Math.max(
             1,
             Number(item.quantity || 1) + delta
         );
 
-        const nextDraft = quoteDraft.map((x) =>
-            x.id === item.id
-                ? {
-                    ...x,
-                    quantity: next,
-                    included: true
-                }
-                : x
+        const nextDraft = quoteDraft.map(
+            (draftItem) =>
+                draftItem.id === item.id
+                    ? {
+                        ...draftItem,
+                        quantity: nextQuantity,
+                        included: true,
+                    }
+                    : draftItem
         );
 
         setQuoteDraft(nextDraft);
@@ -555,22 +654,32 @@ export default function ClientProposal() {
     };
 
     const toggleQuoteItem = (item) => {
-        const nextDraft = quoteDraft.map((x) =>
-            x.id === item.id
-                ? {
-                    ...x,
-                    included: !x.included,
-                    quantity: !x.included
-                        ? Math.max(
-                            1,
-                            Number(x.quantity || 1)
-                        )
-                        : x.quantity
-                }
-                : x
+        const nextDraft = quoteDraft.map(
+            (draftItem) =>
+                draftItem.id === item.id
+                    ? {
+                        ...draftItem,
+                        included:
+                            !draftItem.included,
+                        quantity:
+                            !draftItem.included
+                                ? Math.max(
+                                    1,
+                                    Number(
+                                        draftItem.quantity ||
+                                        1
+                                    )
+                                )
+                                : draftItem.quantity,
+                    }
+                    : draftItem
         );
 
-        if (!nextDraft.some((x) => x.included)) {
+        if (
+            !nextDraft.some(
+                (draftItem) => draftItem.included
+            )
+        ) {
             setError(
                 "At least one quotation item must remain included."
             );
@@ -598,7 +707,7 @@ export default function ClientProposal() {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
-                        Accept: "application/json"
+                        Accept: "application/json",
                     },
                     credentials: "same-origin",
                     body: JSON.stringify(
@@ -607,7 +716,9 @@ export default function ClientProposal() {
                 }
             );
 
-            const data = await response.json().catch(() => null);
+            const data = await response
+                .json()
+                .catch(() => null);
 
             if (!response.ok || !data?.success) {
                 throw new Error(
@@ -618,35 +729,34 @@ export default function ClientProposal() {
                 );
             }
 
-            setProposal((p) => ({
-                ...p,
+            setProposal((currentProposal) => ({
+                ...currentProposal,
                 quotation:
                     data.quotation ||
-                    p.quotation,
+                    currentProposal.quotation,
                 total_price:
                     data.total_price ??
-                    p.total_price,
+                    currentProposal.total_price,
                 formatted_total:
                     data.formatted_total ||
-                    p.formatted_total,
+                    currentProposal.formatted_total,
             }));
 
             if (data.quotation) {
                 setQuotePreview(data.quotation);
 
                 setQuoteDraft(
-                    (data.quotation.items || []).map(
-                        (item) => ({
-                            ...item,
-                            quantity: Number(
-                                item.quantity || 0
-                            ),
-                            included:
-                                Number(
-                                    item.quantity || 0
-                                ) > 0,
-                        })
-                    )
+                    (
+                        data.quotation.items || []
+                    ).map((item) => ({
+                        ...item,
+                        quantity: Number(
+                            item.quantity || 0
+                        ),
+                        included:
+                            Number(item.quantity || 0) >
+                            0,
+                    }))
                 );
             }
 
@@ -658,12 +768,11 @@ export default function ClientProposal() {
             );
 
             await fetchProposal({
-                quiet: true
+                quiet: true,
             });
-
         } catch (e) {
             setError(
-                e.message ||
+                e?.message ||
                 "Unable to save quotation."
             );
         } finally {
@@ -684,13 +793,15 @@ export default function ClientProposal() {
                 {
                     method: "POST",
                     headers: {
-                        Accept: "application/json"
+                        Accept: "application/json",
                     },
                     credentials: "same-origin",
                 }
             );
 
-            const data = await response.json().catch(() => null);
+            const data = await response
+                .json()
+                .catch(() => null);
 
             if (!response.ok || !data?.success) {
                 throw new Error(
@@ -701,14 +812,14 @@ export default function ClientProposal() {
                 );
             }
 
-            setProposal((p) => ({
-                ...p,
+            setProposal((currentProposal) => ({
+                ...currentProposal,
                 total_price:
                     data.proposal_total ??
-                    p.total_price,
+                    currentProposal.total_price,
                 formatted_total:
                     data.formatted_total ||
-                    p.formatted_total,
+                    currentProposal.formatted_total,
             }));
 
             setNotice(
@@ -716,12 +827,11 @@ export default function ClientProposal() {
             );
 
             await fetchProposal({
-                quiet: true
+                quiet: true,
             });
-
         } catch (e) {
             setError(
-                e.message ||
+                e?.message ||
                 "Unable to update this feature."
             );
         } finally {
@@ -735,7 +845,7 @@ export default function ClientProposal() {
 
         try {
             const payload = {
-                comment: acceptComment.trim()
+                comment: acceptComment.trim(),
             };
 
             if (proposal?.quotation) {
@@ -751,14 +861,16 @@ export default function ClientProposal() {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
-                        Accept: "application/json"
+                        Accept: "application/json",
                     },
                     credentials: "same-origin",
                     body: JSON.stringify(payload),
                 }
             );
 
-            const data = await response.json().catch(() => null);
+            const data = await response
+                .json()
+                .catch(() => null);
 
             if (!response.ok || !data?.success) {
                 throw new Error(
@@ -777,12 +889,11 @@ export default function ClientProposal() {
             );
 
             await fetchProposal({
-                quiet: true
+                quiet: true,
             });
-
         } catch (e) {
             setError(
-                e.message ||
+                e?.message ||
                 "Unable to accept this proposal."
             );
         } finally {
@@ -810,16 +921,19 @@ export default function ClientProposal() {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
-                        Accept: "application/json"
+                        Accept: "application/json",
                     },
                     credentials: "same-origin",
                     body: JSON.stringify({
-                        comment: declineComment.trim()
+                        comment:
+                            declineComment.trim(),
                     }),
                 }
             );
 
-            const data = await response.json().catch(() => null);
+            const data = await response
+                .json()
+                .catch(() => null);
 
             if (!response.ok || !data?.success) {
                 throw new Error(
@@ -838,12 +952,11 @@ export default function ClientProposal() {
             );
 
             await fetchProposal({
-                quiet: true
+                quiet: true,
             });
-
         } catch (e) {
             setError(
-                e.message ||
+                e?.message ||
                 "Unable to decline this proposal."
             );
         } finally {
@@ -888,7 +1001,10 @@ export default function ClientProposal() {
                     </p>
 
                     <button
-                        onClick={() => fetchProposal()}
+                        type="button"
+                        onClick={() =>
+                            fetchProposal()
+                        }
                         className="mt-6 inline-flex items-center gap-2 rounded-xl bg-slate-950 px-5 py-3 font-black text-white"
                     >
                         <RefreshCw size={17} />
@@ -899,7 +1015,8 @@ export default function ClientProposal() {
         );
     }
 
-    const client = proposal.client || {};
+    const client =
+        proposal.client || {};
 
     const clientName =
         client.name ||
@@ -928,7 +1045,6 @@ export default function ClientProposal() {
             <div className="pointer-events-none fixed inset-x-0 top-0 h-[520px] bg-[radial-gradient(circle_at_20%_10%,rgba(37,99,235,0.11),transparent_34%),radial-gradient(circle_at_80%_10%,rgba(124,58,237,0.09),transparent_30%)]" />
 
             <main className="relative mx-auto max-w-7xl px-4 pb-36 pt-5 sm:px-6 sm:pt-8 lg:px-8">
-
                 {proposal.status === "accepted" && (
                     <div className="mb-5 flex items-start gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-800">
                         <CheckCircle2
@@ -951,14 +1067,21 @@ export default function ClientProposal() {
                 {notice && (
                     <div className="mb-5 flex items-start justify-between gap-3 rounded-2xl border border-emerald-200 bg-white p-4 shadow-sm">
                         <div className="flex gap-3 text-emerald-700">
-                            <CheckCircle2 size={20} />
+                            <CheckCircle2
+                                size={20}
+                            />
+
                             <span className="text-sm font-bold">
                                 {notice}
                             </span>
                         </div>
 
                         <button
-                            onClick={() => setNotice("")}
+                            type="button"
+                            onClick={() =>
+                                setNotice("")
+                            }
+                            aria-label="Dismiss notification"
                         >
                             <X
                                 size={18}
@@ -971,14 +1094,21 @@ export default function ClientProposal() {
                 {error && (
                     <div className="mb-5 flex items-start justify-between gap-3 rounded-2xl border border-red-200 bg-white p-4 shadow-sm">
                         <div className="flex gap-3 text-red-700">
-                            <XCircle size={20} />
+                            <XCircle
+                                size={20}
+                            />
+
                             <span className="text-sm font-bold">
                                 {error}
                             </span>
                         </div>
 
                         <button
-                            onClick={() => setError("")}
+                            type="button"
+                            onClick={() =>
+                                setError("")
+                            }
+                            aria-label="Dismiss error"
                         >
                             <X
                                 size={18}
@@ -994,7 +1124,6 @@ export default function ClientProposal() {
 
                     <div className="relative">
                         <div className="flex flex-col justify-between gap-8 lg:flex-row lg:items-start">
-
                             <div className="max-w-4xl">
                                 <div className="mb-8 flex items-center gap-3">
                                     <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-lg font-black text-slate-950">
@@ -1014,11 +1143,15 @@ export default function ClientProposal() {
 
                                 <div className="mb-4 flex flex-wrap gap-2">
                                     <span className="rounded-full border border-white/10 bg-white/10 px-3 py-1.5 text-xs font-bold">
-                                        Status · {titleize(proposal.status)}
+                                        Status ·{" "}
+                                        {titleize(
+                                            proposal.status
+                                        )}
                                     </span>
 
                                     <span className="rounded-full border border-white/10 bg-white/10 px-3 py-1.5 text-xs font-bold">
-                                        Proposal v{proposal.version}
+                                        Proposal v
+                                        {proposal.version}
                                     </span>
 
                                     <span className="rounded-full border border-white/10 bg-white/10 px-3 py-1.5 text-xs font-bold">
@@ -1027,7 +1160,8 @@ export default function ClientProposal() {
                                 </div>
 
                                 <div className="text-xs font-black uppercase tracking-[0.22em] text-blue-300">
-                                    Prepared for {clientName}
+                                    Prepared for{" "}
+                                    {clientName}
                                 </div>
 
                                 <h1 className="mt-3 max-w-4xl text-3xl font-black leading-[1.08] tracking-[-0.04em] sm:text-5xl lg:text-6xl">
@@ -1036,7 +1170,9 @@ export default function ClientProposal() {
 
                                 {proposal.client_summary && (
                                     <p className="mt-5 max-w-3xl text-base leading-8 text-slate-300 sm:text-lg">
-                                        {proposal.client_summary}
+                                        {
+                                            proposal.client_summary
+                                        }
                                     </p>
                                 )}
                             </div>
@@ -1051,18 +1187,26 @@ export default function ClientProposal() {
                                 </div>
 
                                 <div className="mt-4 border-t border-white/10 pt-4 text-sm leading-6 text-slate-400">
-                                    {quoteDirty && proposal.quotation
+                                    {quoteDirty &&
+                                        proposal.quotation
                                         ? "Live preview — save the quotation to make this investment permanent."
                                         : "This reflects the current saved scope and commercial selection."}
                                 </div>
 
                                 {canEdit && (
                                     <button
-                                        onClick={() => setAcceptOpen(true)}
+                                        type="button"
+                                        onClick={() =>
+                                            setAcceptOpen(
+                                                true
+                                            )
+                                        }
                                         className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-white px-4 py-3.5 font-black text-slate-950 transition hover:bg-blue-50"
                                     >
                                         Review & Accept
-                                        <ArrowRight size={17} />
+                                        <ArrowRight
+                                            size={17}
+                                        />
                                     </button>
                                 )}
                             </div>
@@ -1072,7 +1216,6 @@ export default function ClientProposal() {
 
                 <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_310px]">
                     <div className="space-y-6">
-
                         <Section
                             icon={UserRound}
                             eyebrow="Proposal details"
@@ -1081,47 +1224,95 @@ export default function ClientProposal() {
                         >
                             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                                 {[
-                                    ["Client", clientName, UserRound],
-                                    ["Email", clientEmail, Mail],
-                                    ["Version", `v${proposal.version}`, FileCheck2],
-                                    ["Valid until", dateText(proposal.expires_at), CalendarDays],
+                                    [
+                                        "Client",
+                                        clientName,
+                                        UserRound,
+                                    ],
+                                    [
+                                        "Email",
+                                        clientEmail,
+                                        Mail,
+                                    ],
+                                    [
+                                        "Version",
+                                        `v${proposal.version}`,
+                                        FileCheck2,
+                                    ],
+                                    [
+                                        "Valid until",
+                                        dateText(
+                                            proposal.expires_at
+                                        ),
+                                        CalendarDays,
+                                    ],
                                 ]
-                                    .filter(([, v]) => v && v !== "—")
-                                    .map(([label, value, Icon]) => (
-                                        <div
-                                            key={label}
-                                            className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4"
-                                        >
-                                            <Icon
-                                                size={17}
-                                                className="mb-3 text-blue-600"
-                                            />
+                                    .filter(
+                                        ([, value]) =>
+                                            value &&
+                                            value !== "—"
+                                    )
+                                    .map(
+                                        ([
+                                            label,
+                                            value,
+                                            Icon,
+                                        ]) => (
+                                            <div
+                                                key={
+                                                    label
+                                                }
+                                                className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4"
+                                            >
+                                                <Icon
+                                                    size={
+                                                        17
+                                                    }
+                                                    className="mb-3 text-blue-600"
+                                                />
 
-                                            <div className="text-[10px] font-black uppercase tracking-wider text-slate-400">
-                                                {label}
-                                            </div>
+                                                <div className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+                                                    {
+                                                        label
+                                                    }
+                                                </div>
 
-                                            <div className="mt-1 break-words text-sm font-black text-slate-900">
-                                                {value}
+                                                <div className="mt-1 break-words text-sm font-black text-slate-900">
+                                                    {
+                                                        value
+                                                    }
+                                                </div>
                                             </div>
-                                        </div>
-                                    ))}
+                                        )
+                                    )}
                             </div>
                         </Section>
 
-                        {hasValue(proposal.business_objectives) && (
-                            <Section
-                                icon={BriefcaseBusiness}
-                                eyebrow="Why this project"
-                                title="Business Objectives"
-                                description="The outcomes this engagement is designed to achieve."
-                            >
-                                <SmartValue
-                                    value={proposal.business_objectives}
-                                />
-                            </Section>
-                        )}
+                        {hasValue(
+                            proposal.business_objectives
+                        ) && (
+                                <Section
+                                    icon={
+                                        BriefcaseBusiness
+                                    }
+                                    eyebrow="Why this project"
+                                    title="Business Objectives"
+                                    description="The outcomes this engagement is designed to achieve."
+                                >
+                                    <SmartValue
+                                        value={
+                                            proposal.business_objectives
+                                        }
+                                    />
+                                </Section>
+                            )}
 
+                        {/*
+                         * QUOTATION / PROCUREMENT
+                         *
+                         * Itemized pricing is intentionally visible here.
+                         * This includes Unit Price and Line Total.
+                         */}
                         {proposal.quotation && (
                             <Section
                                 icon={PackageCheck}
@@ -1132,239 +1323,332 @@ export default function ClientProposal() {
                                 <div className="mb-6 flex flex-col justify-between gap-4 rounded-2xl bg-slate-950 p-5 text-white sm:flex-row sm:items-center">
                                     <div>
                                         <div className="text-lg font-black">
-                                            {proposal.quotation.title ||
+                                            {proposal
+                                                .quotation
+                                                .title ||
                                                 "Project Quotation"}
                                         </div>
 
-                                        {proposal.quotation.description && (
-                                            <div className="mt-1 max-w-2xl text-sm leading-6 text-slate-400">
-                                                {proposal.quotation.description}
-                                            </div>
-                                        )}
+                                        {proposal
+                                            .quotation
+                                            .description && (
+                                                <div className="mt-1 max-w-2xl text-sm leading-6 text-slate-400">
+                                                    {
+                                                        proposal
+                                                            .quotation
+                                                            .description
+                                                    }
+                                                </div>
+                                            )}
                                     </div>
 
                                     <Badge tone="blue">
                                         {titleize(
-                                            proposal.quotation.status ||
+                                            proposal
+                                                .quotation
+                                                .status ||
                                             "priced"
                                         )}
                                     </Badge>
                                 </div>
 
-                                {proposal.quotation.purpose && (
-                                    <div className="mb-5 rounded-2xl border border-blue-100 bg-blue-50/60 p-4 text-sm leading-6 text-slate-600">
-                                        <strong className="text-slate-900">
-                                            Purpose:
-                                        </strong>{" "}
-                                        {proposal.quotation.purpose}
-                                    </div>
-                                )}
+                                {proposal.quotation
+                                    .purpose && (
+                                        <div className="mb-5 rounded-2xl border border-blue-100 bg-blue-50/60 p-4 text-sm leading-6 text-slate-600">
+                                            <strong className="text-slate-900">
+                                                Purpose:
+                                            </strong>{" "}
+                                            {
+                                                proposal
+                                                    .quotation
+                                                    .purpose
+                                            }
+                                        </div>
+                                    )}
 
                                 <div className="space-y-4">
-                                    {quoteDraft.map((item) => {
-                                        const previewItem =
-                                            quotation?.items?.find(
-                                                (x) =>
-                                                    String(x.id) ===
-                                                    String(item.id)
-                                            ) || item;
+                                    {quoteDraft.map(
+                                        (item) => {
+                                            const previewItem =
+                                                quotation?.items?.find(
+                                                    (
+                                                        preview
+                                                    ) =>
+                                                        String(
+                                                            preview.id
+                                                        ) ===
+                                                        String(
+                                                            item.id
+                                                        )
+                                                ) ||
+                                                item;
 
-                                        return (
-                                            <div
-                                                key={item.id}
-                                                className={`rounded-3xl border p-5 transition ${item.included
-                                                        ? "border-slate-200 bg-white"
-                                                        : "border-slate-200 bg-slate-50 opacity-70"
-                                                    }`}
-                                            >
-                                                <div className="flex flex-col justify-between gap-4 sm:flex-row">
-                                                    <div>
-                                                        {item.category && (
-                                                            <div className="text-[10px] font-black uppercase tracking-[0.16em] text-blue-600">
-                                                                {titleize(
-                                                                    item.category
-                                                                )}
-                                                            </div>
-                                                        )}
-
-                                                        <h3 className="mt-1 text-lg font-black text-slate-950">
-                                                            {item.name}
-                                                        </h3>
-
-                                                        {item.description && (
-                                                            <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-500">
-                                                                {item.description}
-                                                            </p>
-                                                        )}
-                                                    </div>
-
-                                                    <div className="shrink-0 sm:text-right">
-                                                        <div className="text-[10px] font-black uppercase tracking-wider text-slate-400">
-                                                            Line total
-                                                        </div>
-
-                                                        <div className="mt-1 text-lg font-black text-slate-950">
-                                                            {money(
-                                                                previewItem.total_price,
-                                                                currency
+                                            return (
+                                                <div
+                                                    key={
+                                                        item.id
+                                                    }
+                                                    className={`rounded-3xl border p-5 transition ${item.included
+                                                            ? "border-slate-200 bg-white"
+                                                            : "border-slate-200 bg-slate-50 opacity-70"
+                                                        }`}
+                                                >
+                                                    <div className="flex flex-col justify-between gap-4 sm:flex-row">
+                                                        <div>
+                                                            {item.category && (
+                                                                <div className="text-[10px] font-black uppercase tracking-[0.16em] text-blue-600">
+                                                                    {titleize(
+                                                                        item.category
+                                                                    )}
+                                                                </div>
                                                             )}
-                                                        </div>
-                                                    </div>
-                                                </div>
 
-                                                <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-
-                                                    {item.brand && (
-                                                        <div className="rounded-xl bg-slate-50 p-3">
-                                                            <div className="text-[10px] font-black uppercase text-slate-400">
-                                                                Brand
-                                                            </div>
-
-                                                            <div className="mt-1 text-sm font-bold">
-                                                                {item.brand}
-                                                            </div>
-                                                        </div>
-                                                    )}
-
-                                                    {item.model && (
-                                                        <div className="rounded-xl bg-slate-50 p-3">
-                                                            <div className="text-[10px] font-black uppercase text-slate-400">
-                                                                Model
-                                                            </div>
-
-                                                            <div className="mt-1 text-sm font-bold">
-                                                                {item.model}
-                                                            </div>
-                                                        </div>
-                                                    )}
-
-                                                    {/* Quotations can show unit prices */}
-                                                    <div className="rounded-xl bg-slate-50 p-3">
-                                                        <div className="text-[10px] font-black uppercase text-slate-400">
-                                                            Unit price
-                                                        </div>
-
-                                                        <div className="mt-1 text-sm font-bold">
-                                                            {money(
-                                                                item.unit_price,
-                                                                currency
-                                                            )}
-                                                        </div>
-                                                    </div>
-
-                                                    <div className="rounded-xl bg-slate-50 p-3">
-                                                        <div className="text-[10px] font-black uppercase text-slate-400">
-                                                            Quantity
-                                                        </div>
-
-                                                        {canEdit &&
-                                                            item.included ? (
-                                                            <div className="mt-1 flex items-center gap-2">
-                                                                <button
-                                                                    onClick={() =>
-                                                                        changeQuantity(
-                                                                            item,
-                                                                            -1
-                                                                        )
-                                                                    }
-                                                                    className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white hover:bg-slate-100"
-                                                                >
-                                                                    <Minus size={14} />
-                                                                </button>
-
-                                                                <span className="min-w-8 text-center text-sm font-black">
-                                                                    {item.quantity}
-                                                                </span>
-
-                                                                <button
-                                                                    onClick={() =>
-                                                                        changeQuantity(
-                                                                            item,
-                                                                            1
-                                                                        )
-                                                                    }
-                                                                    className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white hover:bg-slate-100"
-                                                                >
-                                                                    <Plus size={14} />
-                                                                </button>
-                                                            </div>
-                                                        ) : (
-                                                            <div className="mt-1 text-sm font-bold">
-                                                                {item.quantity}
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                </div>
-
-                                                {hasValue(
-                                                    item.specifications
-                                                ) && (
-                                                        <div className="mt-4 border-t border-slate-100 pt-4">
-                                                            <div className="mb-3 text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">
-                                                                Specifications
-                                                            </div>
-
-                                                            <SmartValue
-                                                                value={
-                                                                    item.specifications
+                                                            <h3 className="mt-1 text-lg font-black text-slate-950">
+                                                                {
+                                                                    item.name
                                                                 }
-                                                            />
-                                                        </div>
-                                                    )}
+                                                            </h3>
 
-                                                {canEdit && (
-                                                    <button
-                                                        onClick={() =>
-                                                            toggleQuoteItem(
-                                                                item
-                                                            )
-                                                        }
-                                                        className={`mt-4 inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-black ${item.included
-                                                                ? "bg-red-50 text-red-700 hover:bg-red-100"
-                                                                : "bg-blue-600 text-white hover:bg-blue-700"
-                                                            }`}
-                                                    >
-                                                        {item.included ? (
-                                                            <Trash2 size={15} />
-                                                        ) : (
-                                                            <Plus size={15} />
+                                                            {item.description && (
+                                                                <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-500">
+                                                                    {
+                                                                        item.description
+                                                                    }
+                                                                </p>
+                                                            )}
+                                                        </div>
+
+                                                        {previewItem.total_price !==
+                                                            null &&
+                                                            previewItem.total_price !==
+                                                            undefined && (
+                                                                <div className="shrink-0 sm:text-right">
+                                                                    <div className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+                                                                        Line
+                                                                        total
+                                                                    </div>
+
+                                                                    <div className="mt-1 text-lg font-black text-slate-950">
+                                                                        {money(
+                                                                            previewItem.total_price,
+                                                                            currency
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            )}
+                                                    </div>
+
+                                                    <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                                                        {item.brand && (
+                                                            <div className="rounded-xl bg-slate-50 p-3">
+                                                                <div className="text-[10px] font-black uppercase text-slate-400">
+                                                                    Brand
+                                                                </div>
+
+                                                                <div className="mt-1 text-sm font-bold">
+                                                                    {
+                                                                        item.brand
+                                                                    }
+                                                                </div>
+                                                            </div>
                                                         )}
 
-                                                        {item.included
-                                                            ? "Remove item"
-                                                            : "Restore item"}
-                                                    </button>
-                                                )}
-                                            </div>
-                                        );
-                                    })}
+                                                        {item.model && (
+                                                            <div className="rounded-xl bg-slate-50 p-3">
+                                                                <div className="text-[10px] font-black uppercase text-slate-400">
+                                                                    Model
+                                                                </div>
+
+                                                                <div className="mt-1 text-sm font-bold">
+                                                                    {
+                                                                        item.model
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                        )}
+
+                                                        {item.unit_price !==
+                                                            null &&
+                                                            item.unit_price !==
+                                                            undefined && (
+                                                                <div className="rounded-xl bg-slate-50 p-3">
+                                                                    <div className="text-[10px] font-black uppercase text-slate-400">
+                                                                        Unit
+                                                                        price
+                                                                    </div>
+
+                                                                    <div className="mt-1 text-sm font-bold">
+                                                                        {money(
+                                                                            item.unit_price,
+                                                                            currency
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            )}
+
+                                                        <div className="rounded-xl bg-slate-50 p-3">
+                                                            <div className="text-[10px] font-black uppercase text-slate-400">
+                                                                Quantity
+                                                            </div>
+
+                                                            {canEdit &&
+                                                                item.included ? (
+                                                                <div className="mt-1 flex items-center gap-2">
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() =>
+                                                                            changeQuantity(
+                                                                                item,
+                                                                                -1
+                                                                            )
+                                                                        }
+                                                                        className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white hover:bg-slate-100"
+                                                                        aria-label={`Decrease ${item.name} quantity`}
+                                                                    >
+                                                                        <Minus
+                                                                            size={
+                                                                                14
+                                                                            }
+                                                                        />
+                                                                    </button>
+
+                                                                    <span className="min-w-8 text-center text-sm font-black">
+                                                                        {
+                                                                            item.quantity
+                                                                        }
+                                                                    </span>
+
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() =>
+                                                                            changeQuantity(
+                                                                                item,
+                                                                                1
+                                                                            )
+                                                                        }
+                                                                        className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white hover:bg-slate-100"
+                                                                        aria-label={`Increase ${item.name} quantity`}
+                                                                    >
+                                                                        <Plus
+                                                                            size={
+                                                                                14
+                                                                            }
+                                                                        />
+                                                                    </button>
+                                                                </div>
+                                                            ) : (
+                                                                <div className="mt-1 text-sm font-bold">
+                                                                    {
+                                                                        item.quantity
+                                                                    }
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+
+                                                    {hasValue(
+                                                        item.specifications
+                                                    ) && (
+                                                            <div className="mt-4 border-t border-slate-100 pt-4">
+                                                                <div className="mb-3 text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">
+                                                                    Specifications
+                                                                </div>
+
+                                                                <SmartValue
+                                                                    value={
+                                                                        item.specifications
+                                                                    }
+                                                                />
+                                                            </div>
+                                                        )}
+
+                                                    {canEdit && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() =>
+                                                                toggleQuoteItem(
+                                                                    item
+                                                                )
+                                                            }
+                                                            className={`mt-4 inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-black ${item.included
+                                                                    ? "bg-red-50 text-red-700 hover:bg-red-100"
+                                                                    : "bg-blue-600 text-white hover:bg-blue-700"
+                                                                }`}
+                                                        >
+                                                            {item.included ? (
+                                                                <Trash2
+                                                                    size={
+                                                                        15
+                                                                    }
+                                                                />
+                                                            ) : (
+                                                                <Plus
+                                                                    size={
+                                                                        15
+                                                                    }
+                                                                />
+                                                            )}
+
+                                                            {item.included
+                                                                ? "Remove item"
+                                                                : "Restore item"}
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            );
+                                        }
+                                    )}
                                 </div>
 
-                                <div className="mt-6 ml-auto max-w-lg rounded-3xl bg-slate-50 p-5">
+                                <div className="ml-auto mt-6 max-w-lg rounded-3xl bg-slate-50 p-5">
                                     {[
-                                        ["Subtotal", quotation?.subtotal],
-                                        ["Discount", quotation?.discount, true],
-                                        ["Tax", quotation?.tax],
-                                        ["Delivery", quotation?.delivery_fee],
+                                        [
+                                            "Subtotal",
+                                            quotation?.subtotal,
+                                            false,
+                                        ],
+                                        [
+                                            "Discount",
+                                            quotation?.discount,
+                                            true,
+                                        ],
+                                        [
+                                            "Tax",
+                                            quotation?.tax,
+                                            false,
+                                        ],
+                                        [
+                                            "Delivery",
+                                            quotation?.delivery_fee,
+                                            false,
+                                        ],
                                     ]
                                         .filter(
-                                            ([, v]) =>
-                                                v !== null &&
-                                                v !== undefined &&
-                                                Number(v) !== 0
+                                            ([, value]) =>
+                                                value !==
+                                                null &&
+                                                value !==
+                                                undefined &&
+                                                Number(
+                                                    value
+                                                ) !== 0
                                         )
                                         .map(
                                             ([
                                                 label,
                                                 value,
-                                                negative
+                                                negative,
                                             ]) => (
                                                 <div
-                                                    key={label}
+                                                    key={
+                                                        label
+                                                    }
                                                     className="flex justify-between gap-5 py-2 text-sm text-slate-500"
                                                 >
                                                     <span>
-                                                        {label}
+                                                        {
+                                                            label
+                                                        }
                                                     </span>
 
                                                     <strong className="text-slate-900">
@@ -1382,7 +1666,8 @@ export default function ClientProposal() {
 
                                     <div className="mt-2 flex justify-between gap-5 border-t border-slate-200 pt-4">
                                         <span className="font-black text-slate-950">
-                                            Quotation Total
+                                            Quotation
+                                            Total
                                         </span>
 
                                         <span className="text-xl font-black text-slate-950">
@@ -1405,11 +1690,22 @@ export default function ClientProposal() {
                                             </div>
 
                                             <div className="mt-1 text-xs text-slate-500">
-                                                Only quantity and inclusion can be changed. Prices remain controlled by AB Technologies.
+                                                Only
+                                                quantity
+                                                and
+                                                inclusion
+                                                can be
+                                                changed.
+                                                Prices
+                                                remain
+                                                controlled
+                                                by AB
+                                                Technologies.
                                             </div>
                                         </div>
 
                                         <button
+                                            type="button"
                                             disabled={
                                                 !quoteDirty ||
                                                 action ===
@@ -1423,20 +1719,32 @@ export default function ClientProposal() {
                                             {action ===
                                                 "save-quote" ? (
                                                 <Loader2
-                                                    size={16}
+                                                    size={
+                                                        16
+                                                    }
                                                     className="animate-spin"
                                                 />
                                             ) : (
-                                                <Save size={16} />
+                                                <Save
+                                                    size={
+                                                        16
+                                                    }
+                                                />
                                             )}
 
-                                            Save Quotation
+                                            Save
+                                            Quotation
                                         </button>
                                     </div>
                                 )}
                             </Section>
                         )}
 
+                        {/*
+                         * PROJECT FEATURES
+                         *
+                         * No individual feature prices are displayed.
+                         */}
                         {(required.length > 0 ||
                             recommended.length > 0 ||
                             optional.length > 0) && (
@@ -1444,65 +1752,82 @@ export default function ClientProposal() {
                                     icon={Layers3}
                                     eyebrow="Project scope"
                                     title="Features & Scope"
-                                    description="Required, recommended and optional items can be adjusted before acceptance where editing is enabled."
+                                    description="Review the features included in the proposed solution and adjust the scope before acceptance where editing is enabled."
                                 >
-                                    {required.length > 0 && (
-                                        <div className="mb-7">
-                                            <h3 className="mb-3 text-sm font-black uppercase tracking-wider text-slate-500">
-                                                Required
-                                            </h3>
+                                    {required.length >
+                                        0 && (
+                                            <div className="mb-7">
+                                                <h3 className="mb-3 text-sm font-black uppercase tracking-wider text-slate-500">
+                                                    Required
+                                                </h3>
 
-                                            <div className="grid gap-3">
-                                                {required.map((f) => (
-                                                    <FeatureCard
-                                                        key={f.id}
-                                                        feature={f}
-                                                        kind="required"
-                                                        editable={canEdit}
-                                                        busy={
-                                                            action ===
-                                                            `feature-${f.id}`
-                                                        }
-                                                        onToggle={
-                                                            toggleFeature
-                                                        }
-                                                        currency={
-                                                            currency
-                                                        }
-                                                    />
-                                                ))}
+                                                <div className="grid gap-3">
+                                                    {required.map(
+                                                        (
+                                                            feature
+                                                        ) => (
+                                                            <FeatureCard
+                                                                key={
+                                                                    feature.id
+                                                                }
+                                                                feature={
+                                                                    feature
+                                                                }
+                                                                kind="required"
+                                                                editable={
+                                                                    canEdit
+                                                                }
+                                                                busy={
+                                                                    action ===
+                                                                    `feature-${feature.id}`
+                                                                }
+                                                                onToggle={
+                                                                    toggleFeature
+                                                                }
+                                                            />
+                                                        )
+                                                    )}
+                                                </div>
                                             </div>
-                                        </div>
-                                    )}
+                                        )}
 
-                                    {recommended.length > 0 && (
-                                        <div className="mb-7">
-                                            <h3 className="mb-3 text-sm font-black uppercase tracking-wider text-slate-500">
-                                                Recommended & Included
-                                            </h3>
+                                    {recommended.length >
+                                        0 && (
+                                            <div className="mb-7">
+                                                <h3 className="mb-3 text-sm font-black uppercase tracking-wider text-slate-500">
+                                                    Recommended &
+                                                    Included
+                                                </h3>
 
-                                            <div className="grid gap-3">
-                                                {recommended.map((f) => (
-                                                    <FeatureCard
-                                                        key={f.id}
-                                                        feature={f}
-                                                        kind="recommended"
-                                                        editable={canEdit}
-                                                        busy={
-                                                            action ===
-                                                            `feature-${f.id}`
-                                                        }
-                                                        onToggle={
-                                                            toggleFeature
-                                                        }
-                                                        currency={
-                                                            currency
-                                                        }
-                                                    />
-                                                ))}
+                                                <div className="grid gap-3">
+                                                    {recommended.map(
+                                                        (
+                                                            feature
+                                                        ) => (
+                                                            <FeatureCard
+                                                                key={
+                                                                    feature.id
+                                                                }
+                                                                feature={
+                                                                    feature
+                                                                }
+                                                                kind="recommended"
+                                                                editable={
+                                                                    canEdit
+                                                                }
+                                                                busy={
+                                                                    action ===
+                                                                    `feature-${feature.id}`
+                                                                }
+                                                                onToggle={
+                                                                    toggleFeature
+                                                                }
+                                                            />
+                                                        )
+                                                    )}
+                                                </div>
                                             </div>
-                                        </div>
-                                    )}
+                                        )}
 
                                     {optional.length > 0 && (
                                         <div>
@@ -1511,32 +1836,42 @@ export default function ClientProposal() {
                                             </h3>
 
                                             <div className="grid gap-3">
-                                                {optional.map((f) => (
-                                                    <FeatureCard
-                                                        key={f.id}
-                                                        feature={f}
-                                                        kind="optional"
-                                                        editable={canEdit}
-                                                        busy={
-                                                            action ===
-                                                            `feature-${f.id}`
-                                                        }
-                                                        onToggle={
-                                                            toggleFeature
-                                                        }
-                                                        currency={
-                                                            currency
-                                                        }
-                                                    />
-                                                ))}
+                                                {optional.map(
+                                                    (
+                                                        feature
+                                                    ) => (
+                                                        <FeatureCard
+                                                            key={
+                                                                feature.id
+                                                            }
+                                                            feature={
+                                                                feature
+                                                            }
+                                                            kind="optional"
+                                                            editable={
+                                                                canEdit
+                                                            }
+                                                            busy={
+                                                                action ===
+                                                                `feature-${feature.id}`
+                                                            }
+                                                            onToggle={
+                                                                toggleFeature
+                                                            }
+                                                        />
+                                                    )
+                                                )}
                                             </div>
                                         </div>
                                     )}
                                 </Section>
                             )}
 
-                        {Array.isArray(proposal.screens) &&
-                            proposal.screens.length > 0 && (
+                        {Array.isArray(
+                            proposal.screens
+                        ) &&
+                            proposal.screens.length >
+                            0 && (
                                 <Section
                                     icon={Globe2}
                                     eyebrow="User experience"
@@ -1545,7 +1880,9 @@ export default function ClientProposal() {
                                 >
                                     <div className="grid gap-3 sm:grid-cols-2">
                                         {proposal.screens.map(
-                                            (screen) => (
+                                            (
+                                                screen
+                                            ) => (
                                                 <div
                                                     key={
                                                         screen.id ||
@@ -1555,7 +1892,9 @@ export default function ClientProposal() {
                                                 >
                                                     <div className="flex flex-wrap items-center gap-2">
                                                         <h3 className="font-black text-slate-950">
-                                                            {screen.name}
+                                                            {
+                                                                screen.name
+                                                            }
                                                         </h3>
 
                                                         {screen.screen_type && (
@@ -1569,7 +1908,9 @@ export default function ClientProposal() {
 
                                                     {screen.purpose && (
                                                         <p className="mt-2 text-sm leading-6 text-slate-500">
-                                                            {screen.purpose}
+                                                            {
+                                                                screen.purpose
+                                                            }
                                                         </p>
                                                     )}
 
@@ -1591,41 +1932,52 @@ export default function ClientProposal() {
                                 </Section>
                             )}
 
-                        {Array.isArray(proposal.requirements) &&
-                            proposal.requirements.length > 0 && (
+                        {Array.isArray(
+                            proposal.requirements
+                        ) &&
+                            proposal.requirements
+                                .length > 0 && (
                                 <Section
-                                    icon={CheckCircle2}
+                                    icon={
+                                        CheckCircle2
+                                    }
                                     eyebrow="Requirements"
                                     title="Project Requirements"
                                     description="Functional and delivery requirements identified for this engagement."
                                 >
                                     <div className="grid gap-3">
                                         {proposal.requirements.map(
-                                            (r) => (
+                                            (
+                                                requirement
+                                            ) => (
                                                 <div
                                                     key={
-                                                        r.id ||
-                                                        r.title
+                                                        requirement.id ||
+                                                        requirement.title
                                                     }
                                                     className="rounded-2xl border border-slate-200 p-4"
                                                 >
                                                     <div className="flex flex-wrap items-center gap-2">
                                                         <h3 className="font-black">
-                                                            {r.title}
+                                                            {
+                                                                requirement.title
+                                                            }
                                                         </h3>
 
-                                                        {r.requirement_type && (
+                                                        {requirement.requirement_type && (
                                                             <Badge tone="blue">
                                                                 {titleize(
-                                                                    r.requirement_type
+                                                                    requirement.requirement_type
                                                                 )}
                                                             </Badge>
                                                         )}
                                                     </div>
 
-                                                    {r.description && (
+                                                    {requirement.description && (
                                                         <p className="mt-2 text-sm leading-6 text-slate-500">
-                                                            {r.description}
+                                                            {
+                                                                requirement.description
+                                                            }
                                                         </p>
                                                     )}
                                                 </div>
@@ -1635,65 +1987,85 @@ export default function ClientProposal() {
                                 </Section>
                             )}
 
-                        {hasValue(proposal.deliverables) && (
-                            <Section
-                                icon={FileCheck2}
-                                eyebrow="What you receive"
-                                title="Deliverables"
-                            >
-                                <SmartValue
-                                    value={proposal.deliverables}
-                                />
-                            </Section>
-                        )}
+                        {hasValue(
+                            proposal.deliverables
+                        ) && (
+                                <Section
+                                    icon={FileCheck2}
+                                    eyebrow="What you receive"
+                                    title="Deliverables"
+                                >
+                                    <SmartValue
+                                        value={
+                                            proposal.deliverables
+                                        }
+                                    />
+                                </Section>
+                            )}
 
-                        {hasValue(proposal.timeline) && (
-                            <Section
-                                icon={Clock3}
-                                eyebrow="Delivery plan"
-                                title="Project Timeline"
-                            >
-                                <SmartValue
-                                    value={proposal.timeline}
-                                />
-                            </Section>
-                        )}
+                        {hasValue(
+                            proposal.timeline
+                        ) && (
+                                <Section
+                                    icon={Clock3}
+                                    eyebrow="Delivery plan"
+                                    title="Project Timeline"
+                                >
+                                    <SmartValue
+                                        value={
+                                            proposal.timeline
+                                        }
+                                    />
+                                </Section>
+                            )}
 
-                        {hasValue(proposal.milestones) && (
-                            <Section
-                                icon={CalendarDays}
-                                eyebrow="Execution"
-                                title="Milestones"
-                            >
-                                <SmartValue
-                                    value={proposal.milestones}
-                                />
-                            </Section>
-                        )}
+                        {hasValue(
+                            proposal.milestones
+                        ) && (
+                                <Section
+                                    icon={CalendarDays}
+                                    eyebrow="Execution"
+                                    title="Milestones"
+                                >
+                                    <SmartValue
+                                        value={
+                                            proposal.milestones
+                                        }
+                                    />
+                                </Section>
+                            )}
 
-                        {hasValue(proposal.integrations) && (
-                            <Section
-                                icon={Cpu}
-                                eyebrow="Connected systems"
-                                title="Integrations"
-                            >
-                                <SmartValue
-                                    value={proposal.integrations}
-                                />
-                            </Section>
-                        )}
+                        {hasValue(
+                            proposal.integrations
+                        ) && (
+                                <Section
+                                    icon={Cpu}
+                                    eyebrow="Connected systems"
+                                    title="Integrations"
+                                >
+                                    <SmartValue
+                                        value={
+                                            proposal.integrations
+                                        }
+                                    />
+                                </Section>
+                            )}
 
-                        {hasValue(proposal.technical_scope) && (
-                            <Section
-                                icon={Cpu}
-                                eyebrow="Implementation"
-                                title="Technical Scope"
-                            >
-                                <SmartValue
-                                    value={proposal.technical_scope}
-                                />
-                            </Section>
-                        )}
+                        {hasValue(
+                            proposal.technical_scope
+                        ) && (
+                                <Section
+                                    icon={Cpu}
+                                    eyebrow="Implementation"
+                                    title="Technical Scope"
+                                >
+                                    <SmartValue
+                                        value={
+                                            proposal.technical_scope
+                                        }
+                                    />
+                                </Section>
+                            )}
 
                         {hasValue(proposal.scope) &&
                             !proposal.quotation && (
@@ -1703,44 +2075,59 @@ export default function ClientProposal() {
                                     title="Scope of Work"
                                 >
                                     <SmartValue
-                                        value={proposal.scope}
+                                        value={
+                                            proposal.scope
+                                        }
                                     />
                                 </Section>
                             )}
 
-                        {hasValue(proposal.security) && (
-                            <Section
-                                icon={ShieldCheck}
-                                eyebrow="Protection"
-                                title="Security"
-                            >
-                                <SmartValue
-                                    value={proposal.security}
-                                />
-                            </Section>
-                        )}
+                        {hasValue(
+                            proposal.security
+                        ) && (
+                                <Section
+                                    icon={ShieldCheck}
+                                    eyebrow="Protection"
+                                    title="Security"
+                                >
+                                    <SmartValue
+                                        value={
+                                            proposal.security
+                                        }
+                                    />
+                                </Section>
+                            )}
 
-                        {hasValue(proposal.recurring_costs) && (
-                            <Section
-                                icon={CircleDollarSign}
-                                eyebrow="Ongoing costs"
-                                title="Recurring Costs"
-                            >
-                                <SmartValue
-                                    value={proposal.recurring_costs}
-                                />
-                            </Section>
-                        )}
+                        {hasValue(
+                            proposal.recurring_costs
+                        ) && (
+                                <Section
+                                    icon={
+                                        CircleDollarSign
+                                    }
+                                    eyebrow="Ongoing costs"
+                                    title="Recurring Costs"
+                                >
+                                    <SmartValue
+                                        value={
+                                            proposal.recurring_costs
+                                        }
+                                    />
+                                </Section>
+                            )}
 
-                        {(hasValue(proposal.assumptions) ||
-                            hasValue(proposal.exclusions)) && (
+                        {(hasValue(
+                            proposal.assumptions
+                        ) ||
+                            hasValue(
+                                proposal.exclusions
+                            )) && (
                                 <Section
                                     icon={FileText}
                                     eyebrow="Commercial clarity"
                                     title="Assumptions & Exclusions"
                                 >
                                     <div className="grid gap-5 lg:grid-cols-2">
-
                                         {hasValue(
                                             proposal.assumptions
                                         ) && (
@@ -1780,7 +2167,9 @@ export default function ClientProposal() {
                     <aside className="hidden lg:block">
                         <div className="sticky top-6 rounded-[28px] bg-slate-950 p-5 text-white shadow-2xl">
                             <div className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.18em] text-blue-300">
-                                <Sparkles size={14} />
+                                <Sparkles
+                                    size={14}
+                                />
                                 Proposal summary
                             </div>
 
@@ -1811,14 +2200,18 @@ export default function ClientProposal() {
                                     </span>
 
                                     <strong>
-                                        v{proposal.version}
+                                        v
+                                        {
+                                            proposal.version
+                                        }
                                     </strong>
                                 </div>
 
                                 {proposal.expires_at && (
                                     <div className="flex justify-between gap-4">
                                         <span className="text-slate-400">
-                                            Valid until
+                                            Valid
+                                            until
                                         </span>
 
                                         <strong className="text-right">
@@ -1839,22 +2232,31 @@ export default function ClientProposal() {
                             {canEdit && (
                                 <div className="mt-5 grid gap-2">
                                     <button
+                                        type="button"
                                         onClick={() =>
-                                            setAcceptOpen(true)
+                                            setAcceptOpen(
+                                                true
+                                            )
                                         }
                                         className="flex items-center justify-center gap-2 rounded-xl bg-white px-4 py-3 font-black text-slate-950 hover:bg-blue-50"
                                     >
-                                        <Check size={17} />
+                                        <Check
+                                            size={17}
+                                        />
                                         Accept Proposal
                                     </button>
 
                                     <button
+                                        type="button"
                                         onClick={() =>
-                                            setDeclineOpen(true)
+                                            setDeclineOpen(
+                                                true
+                                            )
                                         }
                                         className="rounded-xl border border-white/10 px-4 py-3 text-sm font-bold text-slate-300 hover:bg-white/5"
                                     >
-                                        Decline / Request changes
+                                        Decline / Request
+                                        changes
                                     </button>
                                 </div>
                             )}
@@ -1866,9 +2268,11 @@ export default function ClientProposal() {
                     <strong className="text-slate-600">
                         AB Technologies
                     </strong>
+
                     <br />
 
                     Innovate. Build. Solve.
+
                     <br />
                     <br />
 
@@ -1890,6 +2294,7 @@ export default function ClientProposal() {
 
                     {canEdit && (
                         <button
+                            type="button"
                             onClick={() =>
                                 setAcceptOpen(true)
                             }
@@ -1926,11 +2331,16 @@ export default function ClientProposal() {
 
                 {quoteDirty && (
                     <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-800">
-                        Your quotation has unsaved changes. Acceptance will submit the current item selections, but use{" "}
+                        Your quotation has unsaved
+                        changes. Acceptance will
+                        submit the current item
+                        selections, but use{" "}
                         <strong>
                             Save Quotation
                         </strong>{" "}
-                        first if you want the quotation itself updated before acceptance.
+                        first if you want the
+                        quotation itself updated
+                        before acceptance.
                     </div>
                 )}
 
@@ -1956,6 +2366,7 @@ export default function ClientProposal() {
 
                 <div className="mt-5 flex gap-3">
                     <button
+                        type="button"
                         onClick={() =>
                             setAcceptOpen(false)
                         }
@@ -1965,12 +2376,11 @@ export default function ClientProposal() {
                     </button>
 
                     <button
+                        type="button"
                         disabled={
                             action === "accept"
                         }
-                        onClick={
-                            acceptProposal
-                        }
+                        onClick={acceptProposal}
                         className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3 font-black text-white disabled:opacity-50"
                     >
                         {action === "accept" ? (
@@ -2015,6 +2425,7 @@ export default function ClientProposal() {
 
                 <div className="mt-5 flex gap-3">
                     <button
+                        type="button"
                         onClick={() =>
                             setDeclineOpen(false)
                         }
@@ -2024,14 +2435,13 @@ export default function ClientProposal() {
                     </button>
 
                     <button
+                        type="button"
                         disabled={
                             action === "decline" ||
                             declineComment.trim()
                                 .length < 5
                         }
-                        onClick={
-                            declineProposal
-                        }
+                        onClick={declineProposal}
                         className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-3 font-black text-white disabled:opacity-40"
                     >
                         {action === "decline" ? (
