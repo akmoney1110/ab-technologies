@@ -1804,12 +1804,12 @@ export default function HeroPage() {
             tracking-[-3px]
             sm:mx-0
             sm:text-left
-            sm:text-6xl
-            lg:text-[52px]
-            xl:text-[50px]
+            sm:text-4xl
+            lg:text-[42px]
+            xl:text-[42px]
         "
                         >
-                            Technology.  Simplified.
+                            You run the business. We run the tech.
 
                             <span className="hidden block">
                                 <span className="text-blue-500">
